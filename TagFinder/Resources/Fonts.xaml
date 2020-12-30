@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:TagFinder.Resources">
+
+    <FontFamily x:Key="MontserratExtraLight">/Resources/Fonts/#Montserrat ExtraLight</FontFamily>
+    <FontFamily x:Key="MontserratLight">/Resources/Fonts/#Montserrat Light</FontFamily>
+    <FontFamily x:Key="MontserratRegular">/Resources/Fonts/#Montserrat Regular</FontFamily>
+    <FontFamily x:Key="MontserratMedium">/Resources/Fonts/#Montserrat Medium</FontFamily>
+    <FontFamily x:Key="MontserratSemiBold">/Resources/Fonts/#Montserrat SemiBold</FontFamily>
+
+</ResourceDictionary>
