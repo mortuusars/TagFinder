@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace TagFinder.Infrastructure
+namespace TagFinder
 {
     public class RelayCommand : ICommand
     {

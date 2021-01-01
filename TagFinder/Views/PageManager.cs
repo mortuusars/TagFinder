@@ -19,24 +19,15 @@ namespace TagFinder
             switch (page)
             {
                 case Pages.LoginPage:
-                    newPage = new Login() { DataContext = new LoginViewModel() };
+                    newPage = new Login() { DataContext = new LoginViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
                     break;
                 case Pages.TagsPage:
-                    newPage = new TagsPage() { DataContext = new TagsViewModel() };
+                    newPage = new TagsPage() { DataContext = new TagsViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
                     break;
             }
 
             CurrentPage = newPage;
             PageChanged?.Invoke(null, newPage);
-        }
-
-        private Page LoginPage()
-        {
-            var vm = new LoginViewModel();
-            vm.LoggedIn += (s, _) => SetPage(Pages.TagsPage);
-
-            var page = new Login() { DataContext = vm };
-            page.
         }
     }
 }

@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -14,48 +9,57 @@ using InstagramApiSharp.API;
 using InstagramApiSharp.API.Builder;
 using InstagramApiSharp.Classes;
 using InstagramApiSharp.Classes.Android.DeviceInfo;
-using TagFinder.Infrastructure;
 
-namespace TagFinder
+namespace TagFinder.InstagramAPI
 {
-    public static class InstaApiService
+    public class StandardInstagramAPI : IInstagramAPI
     {
-        public static event EventHandler LoggedIn;
-        public static event EventHandler LoggedOut;
+        public event EventHandler LoggedIn;
+        public event EventHandler LoggedOut;
 
-        private const string stateFile = "state.bin";
+        public string CurrentUserName { get; private set; }
+        public BitmapImage UserProfilePic { get; private set; }
 
-        public static string LoggedUsername { get; set; }
+        private IInstaApi _instaApi;
 
-        private static IInstaApi _instaApi;
+        private readonly string _userStateFilePath;
+        private readonly ILogger _logger;
+
+        public StandardInstagramAPI(string userStateFilePath, ILogger logger)
+        {
+            _userStateFilePath = userStateFilePath;
+            _logger = logger;
+        }
 
         #region Log In 
 
-        public static async Task<LogInRequiredActions> LogIn(string userName, string password)
+        public async Task<LoginResult> LogInAsync(string userName, string password = null)
         {
-            CreateInstaApiInstance(userName, password);
+            _instaApi = CreateInstaApiInstance(userName, password);
+
+            if (password == null)
+                return TryLogInWithLastUser(userName);
 
             if (!_instaApi.IsUserAuthenticated)
             {
-                Logger.Log($"Logging in as {userName}");
-                StatusMessageService.ChangeStatusMessage($"Logging in as {userName}");
+                _logger.Log($"Logging in as {userName}...");
 
                 var logInResult = await _instaApi.LoginAsync();
 
                 if (!logInResult.Succeeded)
                 {
-                    Logger.Log($"Unable to login: {logInResult.Info.Message}");
+                    _logger.Log($"Unable to login: {logInResult.Info.Message}");
 
                     if (logInResult.Value == InstaLoginResult.ChallengeRequired)
                     {
-                        Logger.Log("Getting login challenge...");
+                        _logger.Log("Getting login challenge...");
                         var challenge = await _instaApi.GetChallengeRequireVerifyMethodAsync();
                         if (challenge.Succeeded)
                         {
                             if (challenge.Value.SubmitPhoneRequired)
                             {
-                                Logger.Log("Phone number required");
-                                return LogInRequiredActions.PhoneNumberRequired;
+                                _logger.Log("Phone number required");
+                                return LoginResult.PhoneNumberRequired;
                             }
                             else
                             {
@@ -64,35 +68,35 @@ namespace TagFinder
                                     if (!string.IsNullOrEmpty(challenge.Value.StepData.PhoneNumber))
                                     {
                                         // send verification code to phone number
-                                        Logger.Log("Sending verification code by SMS...");
+                                        _logger.Log("Sending verification code by SMS...");
                                         var smsVerify = await _instaApi.RequestVerifyCodeToSMSForChallengeRequireAsync();
 
                                         if (smsVerify.Succeeded)
                                         {
-                                            Logger.Log("Code sent by SMS");
-                                            return LogInRequiredActions.SMSVerifyRequired;
+                                            _logger.Log("Code sent by SMS");
+                                            return LoginResult.SMSVerifyRequired;
                                         }
                                         else
                                         {
-                                            Logger.Log(smsVerify.Info.Message);
-                                            return LogInRequiredActions.Error;
+                                            _logger.Log(smsVerify.Info.Message);
+                                            return LoginResult.Error;
                                         }
 
                                     }
                                     if (!string.IsNullOrEmpty(challenge.Value.StepData.Email))
                                     {
-                                        Logger.Log("Sending verification code by Email...");
+                                        _logger.Log("Sending verification code by Email...");
                                         var emailVerify = await _instaApi.RequestVerifyCodeToEmailForChallengeRequireAsync();
 
                                         if (emailVerify.Succeeded)
                                         {
-                                            Logger.Log("Code sent to email");
-                                            return LogInRequiredActions.EmailVerifyRequired;
+                                            _logger.Log("Code sent to email");
+                                            return LoginResult.EmailVerifyRequired;
                                         }
                                         else
                                         {
-                                            Logger.Log(emailVerify.Info.Message);
-                                            return LogInRequiredActions.Error;
+                                            _logger.Log(emailVerify.Info.Message);
+                                            return LoginResult.Error;
                                         }
                                     }
                                 }
@@ -100,34 +104,41 @@ namespace TagFinder
                         }
                         else
                         {
-                            Logger.Log(challenge.Info.Message);
-                            return LogInRequiredActions.VerificationFailed;
+                            _logger.Log(challenge.Info.Message);
+                            return LoginResult.VerificationFailed;
                         }
                     }
                     else if (logInResult.Value == InstaLoginResult.BadPassword || logInResult.Value == InstaLoginResult.InvalidUser)
                     {
-                        Logger.Log("Username of password is invalid");
-                        return LogInRequiredActions.Error;
+                        _logger.Log("Username of password is invalid");
+                        return LoginResult.Error;
                     }
                     else
                     {
-                        Logger.Log(logInResult.Info.Message);
-                        return LogInRequiredActions.Error;
+                        _logger.Log(logInResult.Info.Message);
+                        return LoginResult.Error;
                     }
                 }
             }
 
-            await DownloadUserProfilePic(userName);
+            UserProfilePic = await DownloadUserProfilePicAsync(userName);
 
             SaveSession();
 
-            Logger.Log("Logged in successfully");
-            return LogInRequiredActions.Success;
+            _logger.Log("Logged in successfully");
+            return LoginResult.Success;
         }
 
-        public static LogInRequiredActions TryLogInWithLastUser(string userName)
+        private LoginResult TryLogInWithLastUser(string userName)
         {
-            Logger.Log("Trying to log with existing user data");
+            _logger.Log("Trying to log with existing user data...");
+
+            if (!File.Exists(_userStateFilePath))
+            {
+                _logger.Log("Saved user state file does not exists. Full login required.");
+                return LoginResult.FullLogInReqired;
+            }
+
             CreateInstaApiInstance(userName);
 
             TryLoadSavedUserState();
@@ -135,52 +146,52 @@ namespace TagFinder
             if (_instaApi.IsUserAuthenticated)
             {
                 SaveSession();
-                Logger.Log("Successfully restored previous user login data");
-                return LogInRequiredActions.Success;
+                _logger.Log("Successfully restored previous user login data");
+                return LoginResult.Success;
             }
             else
             {
-                Logger.Log("Failed to login as last user. Full login required.");
-                return LogInRequiredActions.FullLogInReqired;
+                _logger.Log("Failed to login as last user. Full login required.");
+                return LoginResult.FullLogInReqired;
             }
         }
 
-        public static async Task ProvidePhoneNumber(string phoneNumber)
+        public async Task ProvidePhoneNumberAsync(string phoneNumber)
         {
             var submitPhone = await _instaApi.SubmitPhoneNumberForChallengeRequireAsync(phoneNumber);
             if (submitPhone.Succeeded)
             {
-                Logger.Log("Phonenumber for Challenge submitted");
+                _logger.Log("Phonenumber for Challenge submitted");
             }
             else
             {
-                Logger.Log(submitPhone.Info.Message);
+                _logger.Log(submitPhone.Info.Message);
             }
         }
 
-        public static async Task<LogInRequiredActions> ProvideVerificationCode(string code)
+        public async Task<LoginResult> ProvideVerificationCodeAsync(string code)
         {
-            Logger.Log("Verifying entered code...");
+            _logger.Log("Verifying entered code...");
             var verifyLogin = await _instaApi.VerifyCodeForChallengeRequireAsync(code);
             if (verifyLogin.Succeeded)
             {
-                Logger.Log("Verification successful");
+                _logger.Log("Verification successful");
                 SaveSession();
-                return LogInRequiredActions.Success;
+                return LoginResult.Success;
             }
             else if (verifyLogin.Value == InstaLoginResult.TwoFactorRequired)
             {
-                Logger.Log("Two Factor required");
-                return LogInRequiredActions.TwoFactorRequired;
+                _logger.Log("Two Factor required");
+                return LoginResult.TwoFactorRequired;
             }
             else
             {
-                Logger.Log(verifyLogin.Info.Message);
-                return LogInRequiredActions.Error;
+                _logger.Log(verifyLogin.Info.Message);
+                return LoginResult.Error;
             }
         }
 
-        private static void CreateInstaApiInstance(string userName = "", string password = "")
+        private static IInstaApi CreateInstaApiInstance(string userName = "", string password = "")
         {
             UserSessionData userSession = new UserSessionData() { UserName = userName, Password = password };
 
@@ -222,55 +233,55 @@ namespace TagFinder
                 FirmwareType = "user"
             };
 
-            _instaApi = InstaApiBuilder.CreateBuilder()
+            var instaApi = InstaApiBuilder.CreateBuilder()
                .SetUser(userSession)
                .SetRequestDelay(RequestDelay.FromSeconds(1, 2))
                .Build();
 
-            _instaApi.SetDevice(device);
+            instaApi.SetDevice(device);
+
+            return instaApi;
         }
 
-        private static void TryLoadSavedUserState()
+        private void TryLoadSavedUserState()
         {
             try
             {
-                if (File.Exists(stateFile))
+                _logger.Log("Loading state from file...");
+                using (var fileStream = File.OpenRead(_userStateFilePath))
                 {
-                    Logger.Log("Loading state from file");
-                    using (var fileStream = File.OpenRead(stateFile))
-                    {
-                        _instaApi.LoadStateDataFromStream(fileStream);
-                    }
+                    _instaApi.LoadStateDataFromStream(fileStream);
+                    _logger.Log("Loaded user state data");
                 }
             }
             catch (Exception e)
             {
-                Logger.Log(e.Message);
+                _logger.Log(e.Message);
             }
         }
 
-        private static void SaveSession()
+        private void SaveSession()
         {
-            Logger.Log("Attempting to save session to file...");
+            _logger.Log("Attempting to save session to file...");
             // Save session
             if (_instaApi == null)
                 return;
             else if (!_instaApi.IsUserAuthenticated)
             {
-                Logger.Log("Not authenticated");
+                _logger.Log("Not authenticated");
                 return;
             }
             else if (_instaApi.SessionHandler != null)
             {
-                Logger.Log("Saving session handler...");
+                _logger.Log("Saving session handler...");
                 _instaApi.SessionHandler.Save();
             }
 
-            LoggedUsername = _instaApi.GetLoggedUser().UserName;
+            CurrentUserName = _instaApi.GetLoggedUser().UserName;
             SaveSessionFile();
         }
 
-        private static void SaveSessionFile()
+        private void SaveSessionFile()
         {
             // save session in file
             var state = _instaApi.GetStateDataAsStream();
@@ -278,32 +289,32 @@ namespace TagFinder
             // use this one:
             // var state = _instaApi.GetStateDataAsString();
             // this returns you session as json string.
-            using (var fileStream = File.Create(stateFile))
+            using (var fileStream = File.Create(_userStateFilePath))
             {
                 state.Seek(0, SeekOrigin.Begin);
                 state.CopyTo(fileStream);
             }
 
-            Logger.Log("Written session to file");
+            _logger.Log("Written session to file");
         }
 
         #endregion
 
-        public static async Task LogOut()
+        public async Task LogOutAsync()
         {
-            Logger.Log("Logging Out...");
+            _logger.Log("Logging Out...");
             var result = await _instaApi.LogoutAsync();
-            Logger.Log($"Loged out: {result.Succeeded}");
+            _logger.Log($"Loged out: {result.Succeeded}");
         }
 
-        private static async Task<List<string>> GetPostDataFromUser(string userName, int pagesToLoad)
+        private async Task<List<string>> GetPostDataFromUserAsync(string userName, int pagesToLoad)
         {
-            Logger.Log($"Getting {pagesToLoad} pages of media from @{userName}...");
+            _logger.Log($"Getting {pagesToLoad} pages of media from @{userName}...");
             var media = await _instaApi.UserProcessor.GetUserMediaAsync(userName, PaginationParameters.MaxPagesToLoad(pagesToLoad));
 
             if (media.Succeeded)
             {
-                Logger.Log($"Found {media.Value.Count} posts");
+                _logger.Log($"Found {media.Value.Count} posts");
 
                 List<string> postTexts = new List<string>();
 
@@ -329,15 +340,15 @@ namespace TagFinder
             }
             else
             {
-                Logger.Log("Getting media failed");
-                Logger.Log(media.Info.Message);
+                _logger.Log("Getting media failed");
+                _logger.Log(media.Info.Message);
                 return null;
             }
         }
 
-        public static async Task<List<TagRecord>> GetTagsFromList(string username, int pagesToLoad, bool includeGlobalCount = false)
+        public async Task<List<TagRecord>> GetTagsFromListAsync(string username, int pagesToLoad, bool includeGlobalCount = false)
         {
-            var list = await GetPostDataFromUser(username, pagesToLoad);
+            var list = await GetPostDataFromUserAsync(username, pagesToLoad);
 
             List<TagRecord> tagList = new List<TagRecord>();
 
@@ -346,7 +357,7 @@ namespace TagFinder
             else if (list.Count < 1)
                 return tagList;
 
-            Logger.Log("Extracting tags from media...");
+            _logger.Log("Extracting tags from media...");
 
             foreach (var item in list)
             {
@@ -365,53 +376,27 @@ namespace TagFinder
                 }
             }
 
-            Logger.Log($"Found {tagList.Count} tags");
+            _logger.Log($"Found {tagList.Count} tags");
             return tagList;
         }
 
-        public static async Task<long> GetGlobalHashtagUses(string hashtag)
+        public async Task<long> GetGlobalHashtagUsesAsync(string hashtag)
         {
             var hashtagInfo = await _instaApi.HashtagProcessor.GetHashtagInfoAsync(hashtag);
             return hashtagInfo.Succeeded ? hashtagInfo.Value.MediaCount : -1;
         }
 
-        public static async Task<BitmapImage> DownloadUserProfilePic(string userName)
+        public async Task<BitmapImage> DownloadUserProfilePicAsync(string userName)
         {
-            Logger.Log("Getting user profile picture");
+            _logger.Log("Getting user profile picture");
             var userInfo = await _instaApi.UserProcessor.GetUserInfoByUsernameAsync(userName);
 
             if (userInfo.Succeeded)
             {
-                Logger.Log("Downloading profile pic");
-                return Utility.GetUserProfilePicFromUrl(userInfo.Value.ProfilePicUrl);
-
-                //try
-                //{
-                //    Image orig;
-
-                //    Logger.Log("Downloading profile pic");
-                //    using (WebClient wc = new WebClient())
-                //    {
-                //        using (Stream s = wc.OpenRead(instaImage.Uri))
-                //        {
-                //            orig = Image.FromStream(s);
-                //        }
-                //    }
-
-                //    using (Bitmap bmp = new Bitmap(48, 48))
-                //    {
-                //        using (var gr = Graphics.FromImage(bmp))
-                //        {
-                //            gr.DrawImage(orig, 0, 0, 48, 48);
-                //            bmp.Save(FileNames.UserProfilePicFilePath, ImageFormat.Jpeg);
-                //            Logger.Log("Saved profile pic to file");
-                //        }
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    Logger.Log(ex.Message);
-                //}
+                _logger.Log("Downloading profile pic");
+                var pic = Utility.GetUserProfilePicFromUrl(userInfo.Value.ProfilePicUrl);
+                UserProfilePic = pic;
+                return pic;
             }
 
             return Utility.GetDefaultProfilePic();

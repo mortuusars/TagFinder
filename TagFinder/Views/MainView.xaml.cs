@@ -5,18 +5,11 @@ namespace TagFinder
 {
     public partial class MainView : Window
     {
-        public MainView()
+        public MainView(PageManager pageManager)
         {
             InitializeComponent();
 
-            PageFrame.Content = PageManager.GetMainViewPage();
-
-            PageManager.PageChanged += OnPageChanged;
-        }
-
-        private void OnPageChanged(object sender, Page e)
-        {
-            PageFrame.Content = e;
+            pageManager.PageChanged += (_, page) => PageFrame.Content = page;
         }
     }
 }

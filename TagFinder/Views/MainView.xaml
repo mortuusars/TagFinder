@@ -75,7 +75,7 @@
 
             <StackPanel VerticalAlignment="Center">
                 
-                <Image wpfanimated:ImageBehavior.AnimatedSource="../Resources/Images/loading_64.gif"
+                <Image wpfanimated:ImageBehavior.AnimatedSource="../Resources/Images/loading_214.gif"
                    wpfanimated:ImageBehavior.AnimateInDesignMode="True"
                    wpfanimated:ImageBehavior.RepeatBehavior="1"
                    wpfanimated:ImageBehavior.AutoStart="True"

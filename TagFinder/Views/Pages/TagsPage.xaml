@@ -288,7 +288,7 @@
                                                HorizontalAlignment="Left"
                                                Foreground="Gray"/>
 
-                                    <TextBlock Text="{Binding GlobalCount}"
+                                    <TextBlock Text="{Binding Count}"
                                                HorizontalAlignment="Right"
                                                Margin="8 0"
                                                Grid.Column="1"
@@ -377,26 +377,18 @@
         <!-- STATUS -->
         <Grid x:Name="StatusPanel"
               Grid.Row="2"
-              Margin="5 2">
+              Margin="4">
 
             <TextBlock x:Name="StatusText"
                        Text="{Binding Status}"
                        FontSize="16"
                        VerticalAlignment="Bottom"
-                       Margin="0 0 0 2"
                        d:Text="Ready"
                        Foreground="Gray"/>
 
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         d:Opacity="1">
-
-                <!--<TextBlock x:Name="LoggedUserText"
-                           Text="{Binding LoggedUsername}"
-                           d:Text="mortuus_cg"
-                           FontSize="18"
-                           Foreground="Gray"/>-->
-
 
                 <Ellipse Width="32"
                          Height="32"
@@ -424,6 +416,7 @@
                        Text="{Binding SelectedCount}"
                        d:Text="20"
                        HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
                        Foreground="Gray"/>
 
         </Grid>

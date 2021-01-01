@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace TagFinder.Infrastructure
+namespace TagFinder
 {
     public static class Utility
     {

@@ -30,7 +30,7 @@ namespace TagFinder.Views.Pages
             if (AllTagsListBox.SelectedItem == null)
                 return;
 
-            ((TagRecord)AllTagsListBox.SelectedItem).GetGlobalCountString();
+            //((TagRecord)AllTagsListBox.SelectedItem).GetGlobalCountString();
 
             //MessageBox.Show(result);
         }

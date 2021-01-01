@@ -12,7 +12,7 @@ namespace TagFinder
         {
             MainViewModel = new MainViewModel();
 
-            MainView = new MainView();
+            MainView = new MainView(Program.PageManager);
             MainView.DataContext = MainViewModel;
 
             MainView.Show();

@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
-using TagFinder.Infrastructure;
-using TagFinder.Views.Pages;
+using TagFinder.InstagramAPI;
 
 namespace TagFinder.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler LoggedIn;
-        public event EventHandler LoggedOut;
 
         public string Username { get; set; }
 
@@ -28,8 +19,16 @@ namespace TagFinder.ViewModels
         public ICommand LogInCommand { get; }
         public ICommand SubmitCodeCommand { get; }
 
-        public LoginViewModel()
+        private IInstagramAPI _instagramAPI;
+        private PageManager _pageManager;
+        private ILogger _logger;
+
+        public LoginViewModel(IInstagramAPI instagramAPI, PageManager pageManager, ILogger logger)
         {
+            _instagramAPI = instagramAPI;
+            _pageManager = pageManager;
+            _logger = logger;
+
             LogInCommand = new RelayCommand(pswrd => OnLogInCommand((string)pswrd));
             SubmitCodeCommand = new RelayCommand(code => OnSubmitCodeCommand((string)code));
 
@@ -42,14 +41,14 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                if (File.Exists(FileNames.LastUserFilePath))
+                if (File.Exists(FileNames.LAST_USER_FILEPATH))
                 {
-                    return File.ReadAllText(FileNames.LastUserFilePath);
+                    return File.ReadAllText(FileNames.LAST_USER_FILEPATH);
                 }
             }
             catch (Exception)
             {
-                Logger.Log("Failed restoring last username");
+                _logger.Log("Failed restoring last username");
             }
 
             return string.Empty;
@@ -59,11 +58,11 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                File.WriteAllTextAsync(FileNames.LastUserFilePath, username);
+                File.WriteAllTextAsync(FileNames.LAST_USER_FILEPATH, username);
             }
             catch (Exception)
             {
-                Logger.Log("Saving last username failed");
+                _logger.Log("Saving last username failed");
             }
         }
 
@@ -79,66 +78,62 @@ namespace TagFinder.ViewModels
                 return;
             }
 
-            ViewManager.MainViewModel.IsOverlayVisible = true;
-            StatusMessageService.ChangeStatusMessage("Logging in as " + Username);
+            StatusManager.Status = "Logging in as " + Username;
+            StatusManager.InProgress = true;
 
-            var logInResult = await InstaApiService.LogIn(Username, password);
+            var logInResult = await _instagramAPI.LogInAsync(Username, password);
 
             switch (logInResult)
             {
-                case LogInRequiredActions.Success:
-                    StatusMessageService.ChangeStatusMessage("Successfully logged in");
-                    LoggedIn?.Invoke(this, EventArgs.Empty);
+                case LoginResult.Success:
+                    StatusManager.Status = "Logged in as " + _instagramAPI.CurrentUserName;
+                    _pageManager.SetPage(Views.Pages.Pages.TagsPage);
                     break;
-                case LogInRequiredActions.PhoneNumberRequired:
-                    StatusMessageService.ChangeStatusMessage("Phone number required");
+                case LoginResult.PhoneNumberRequired:
+                    StatusManager.Status = "Phone number required";
                     return;
-                case LogInRequiredActions.SMSVerifyRequired:
+                case LoginResult.SMSVerifyRequired:
                     IsCodeRequired = true;
                     CodeRequiredMessage = "Enter code from SMS:";
                     break;
-                case LogInRequiredActions.EmailVerifyRequired:
+                case LoginResult.EmailVerifyRequired:
                     IsCodeRequired = true;
                     CodeRequiredMessage = "Enter code from Email:";
                     break;
-                case LogInRequiredActions.TwoFactorRequired:
-                    StatusMessageService.ChangeStatusMessage("Two factor verification required. Not suppoted");
+                case LoginResult.TwoFactorRequired:
+                    StatusManager.Status = "Two factor verification required. Not suppoted";
                     return;
-                case LogInRequiredActions.VerificationFailed:
-                    StatusMessageService.ChangeStatusMessage("Verification failed");
+                case LoginResult.VerificationFailed:
+                    StatusManager.Status = "Verification failed";
                     return;
-                case LogInRequiredActions.Error:
-                    StatusMessageService.ChangeStatusMessage("Error");
-                    return;
+                case LoginResult.Error:
+                    StatusManager.Status = "Error";
+                    break;
             }
 
-            ViewManager.MainViewModel.IsOverlayVisible = false;
-            StatusMessageService.ChangeStatusMessage("");
+            StatusManager.InProgress = false;
         }
 
         private async void OnSubmitCodeCommand(string code)
         {
-            ViewManager.MainViewModel.IsOverlayVisible = true;
-            StatusMessageService.ChangeStatusMessage("Code submitted\nVerifying");
+            StatusManager.InProgress = true;
+            StatusManager.Status = "Code submitted - Verifying";
 
-            var codeVerifyResult = await InstaApiService.ProvideVerificationCode(code);
+            var codeVerifyResult = await _instagramAPI.ProvideVerificationCodeAsync(code);
 
             switch (codeVerifyResult)
             {
-                case LogInRequiredActions.Success:
-                    StatusMessageService.ChangeStatusMessage("Successfully logged in");
-                    LoggedIn?.Invoke(this, EventArgs.Empty);
+                case LoginResult.Success:
+                    StatusManager.Status = "Logged in as " + _instagramAPI.CurrentUserName;
                     break;
-                case LogInRequiredActions.TwoFactorRequired:
-                    StatusMessageService.ChangeStatusMessage("Two factor verification required. Not suppoted");
+                case LoginResult.TwoFactorRequired:
+                    StatusManager.Status = "Two factor verification required. Not suppoted";
                     return;
-                case LogInRequiredActions.Error:
-                    StatusMessageService.ChangeStatusMessage("Error");
+                case LoginResult.Error:
+                    StatusManager.Status = "Error";
                     return;
             }
-
-            ViewManager.MainViewModel.IsOverlayVisible = false;
-            StatusMessageService.ChangeStatusMessage("");
+            StatusManager.InProgress = false;
         }
     }
 }

@@ -8,17 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using TagFinder.Infrastructure;
+using TagFinder.InstagramAPI;
 
 namespace TagFinder.ViewModels
 {
     public class TagsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private const string PREF_DIRECTORY = "Cache/";
-        private const string PAGES_FILENAME = "pagesToLoad.";
-        private const string TAGLIMIT_FILENAME = "tagLimit.";
 
         public List<TagRecord> TagsList { get; set; }
         public ObservableCollection<TagRecord> SelectedTagsList { get; set; } = new ObservableCollection<TagRecord>();
@@ -29,14 +25,12 @@ namespace TagFinder.ViewModels
         public int TagLimit { get; set; } = 20;
         public bool IncludeGlobalCount { get; set; } = false;
 
-        public string Status { get; set; } = StatusMessageService.Status;
+        public string Status { get; set; } = StatusManager.Status;
         public string SelectedCount { get; set; }
 
         public bool IsUserInfoAvailable { get; set; }
         public string LoggedUsername { get; set; }
         public BitmapImage UserProfilePic { get; set; } = Utility.GetDefaultProfilePic();
-
-
 
         public ICommand GetTagsCommand { get; }
         public ICommand ClearSelectedCommand { get; }
@@ -45,8 +39,16 @@ namespace TagFinder.ViewModels
         public ICommand CopySelectedCommand { get; }
         public ICommand LogOutCommand { get; }
 
-        public TagsViewModel()
+        private IInstagramAPI _instagramAPI;
+        private PageManager _pageManager;
+        private ILogger _logger;
+
+        public TagsViewModel(IInstagramAPI instagramAPI, PageManager pageManager, ILogger logger)
         {
+            _instagramAPI = instagramAPI;
+            _pageManager = pageManager;
+            _logger = logger;
+
             GetTagsCommand = new RelayCommand(username => OnGetTagsCommand((string)username));
             ClearSelectedCommand = new RelayCommand(_ => SelectedTagsList.Clear());
             RemoveSelectedCommand = new RelayCommand(items => RemoveSelectedItems((System.Collections.IList)items));
@@ -54,32 +56,37 @@ namespace TagFinder.ViewModels
             CopySelectedCommand = new RelayCommand(_ => CopyToClipboard());
             LogOutCommand = new RelayCommand(_ => OnLogOutCommand());
             
-            StatusMessageService.StatusChanged += (_, message) => Status = message;
+            StatusManager.StatusChanged += (_, e) => Status = StatusManager.Status;
 
             SelectedTagsList.CollectionChanged += OnSelectedChanged;
 
-            SetUserProfileInfoAsync();
+            if (_instagramAPI.UserProfilePic != null)
+                UserProfilePic = _instagramAPI.UserProfilePic;
+
+            IsUserInfoAvailable = true;
 
             ReadPreferences();
         }
 
         private async void OnLogOutCommand()
         {
-            ViewManager.MainViewModel.IsOverlayVisible = true;
-            StatusMessageService.ChangeStatusMessage("Logging out");
-            await InstaApiService.LogOut();
-            PageManager.SetPage(Views.Pages.Pages.LoginPage);
+            StatusManager.Status = "Logging out";
+            StatusManager.InProgress = true;
 
-            ViewManager.MainViewModel.IsOverlayVisible = false;
-            StatusMessageService.ChangeStatusMessage("Logged out");
+            await _instagramAPI.LogOutAsync();
+
+            _pageManager.SetPage(Views.Pages.Pages.LoginPage);
+
+            StatusManager.Status = "Logged out";
+            StatusManager.InProgress = false;
         }
 
-        private async void SetUserProfileInfoAsync()
-        {
-            UserProfilePic = await InstaApiService.DownloadUserProfilePic(InstaApiService.LoggedUsername);
-            LoggedUsername = InstaApiService.LoggedUsername;
-            IsUserInfoAvailable = true;
-        }
+        //private async void SetUserProfileInfoAsync()
+        //{
+        //    UserProfilePic = await StandardInstagramAPI.DownloadUserProfilePic(StandardInstagramAPI.LoggedUsername);
+        //    LoggedUsername = StandardInstagramAPI.LoggedUsername;
+        //    IsUserInfoAvailable = true;
+        //}
 
         private void OnSelectedChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -94,7 +101,8 @@ namespace TagFinder.ViewModels
                 sb.Append(item.Name).Append(' ');
 
             System.Windows.Clipboard.SetText(sb.ToString());
-            StatusMessageService.ChangeStatusMessage("Copied to clipboard");
+
+            StatusManager.Status = "Copied to clipboard";
         }
 
         private void RemoveSelectedItems(System.Collections.IList itemsToRemove)
@@ -124,22 +132,23 @@ namespace TagFinder.ViewModels
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                StatusMessageService.ChangeStatusMessage("Entered username is incorrect");
+                StatusManager.Status = "Entered username is incorrect";
                 return;
             }
 
-            ViewManager.MainViewModel.IsOverlayVisible = true;
-            StatusMessageService.ChangeStatusMessage("Loading tags");
+            StatusManager.Status = "Loading tags";
+            StatusManager.InProgress = true;
 
             SavePreferences();
 
-            var list = await InstaApiService.GetTagsFromList(username, PagesToLoad, IncludeGlobalCount);
+            var list = await _instagramAPI.GetTagsFromListAsync(username, PagesToLoad, IncludeGlobalCount);
+
+            StatusManager.InProgress = false;
 
             if (list == null)
             {
                 IsContentAvailable = false;
-                StatusMessageService.ChangeStatusMessage("Getting tags failed");
-                ViewManager.MainViewModel.IsOverlayVisible = false;
+                StatusManager.Status  = "Getting tags failed";
                 return;
             }
 
@@ -148,15 +157,13 @@ namespace TagFinder.ViewModels
             if (TagsList.Count > 0)
             {
                 IsContentAvailable = true;
-                StatusMessageService.Done();
+                StatusManager.Status = "Done";
             }
             else
             {
                 IsContentAvailable = false;
-                StatusMessageService.ChangeStatusMessage("No posts");
+                StatusManager.Status = "No posts";
             }
-
-            ViewManager.MainViewModel.IsOverlayVisible = false;
         }
 
         #region Preferences
@@ -165,13 +172,13 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                PagesToLoad = Convert.ToInt32(File.ReadAllText(PREF_DIRECTORY + PAGES_FILENAME));
-                TagLimit = Convert.ToInt32(File.ReadAllText(PREF_DIRECTORY + TAGLIMIT_FILENAME));
+                PagesToLoad = Convert.ToInt32(File.ReadAllText(FileNames.PAGES_TO_LOAD_FILEPATH));
+                TagLimit = Convert.ToInt32(File.ReadAllText(FileNames.TAG_LIMIT_FILEPATH));
 
             }
             catch (Exception)
             {
-                Logger.Log("Reading preferences failed");
+                _logger.Log("Reading preferences failed");
             }
 
         }
@@ -180,14 +187,12 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                Directory.CreateDirectory(PREF_DIRECTORY);
-
-                File.WriteAllTextAsync(PREF_DIRECTORY + PAGES_FILENAME, PagesToLoad.ToString());
-                File.WriteAllTextAsync(PREF_DIRECTORY + TAGLIMIT_FILENAME, TagLimit.ToString());
+                File.WriteAllTextAsync(FileNames.PAGES_TO_LOAD_FILEPATH, PagesToLoad.ToString());
+                File.WriteAllTextAsync(FileNames.TAG_LIMIT_FILEPATH, TagLimit.ToString());
             }
             catch (Exception)
             {
-                Logger.Log("Saving preferences failed");
+                _logger.Log("Saving preferences failed");
             }
         }
 

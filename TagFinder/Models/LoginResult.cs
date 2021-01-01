@@ -1,6 +1,6 @@
 ﻿namespace TagFinder
 {
-    public enum LogInRequiredActions
+    public enum LoginResult
     {
         Success,
         PhoneNumberRequired,
