@@ -19,10 +19,6 @@
 
   <ItemGroup>
     <Resource Include="Resources\Images\loading.png" />
-    <Resource Include="Resources\Images\loading_128.gif" />
-    <Resource Include="Resources\Images\loading_194.gif">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -36,8 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\loading_214.gif" />
-    <Resource Include="Resources\Images\loading_64.gif" />
     <Resource Include="Resources\Images\logo.png" />
     <Resource Include="Resources\Images\user_48.png" />
   </ItemGroup>

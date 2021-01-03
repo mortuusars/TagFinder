@@ -9,6 +9,7 @@ using InstagramApiSharp.API;
 using InstagramApiSharp.API.Builder;
 using InstagramApiSharp.Classes;
 using InstagramApiSharp.Classes.Android.DeviceInfo;
+using TagFinder.Logger;
 
 namespace TagFinder.InstagramAPI
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using TagFinder.InstagramAPI;
+using TagFinder.Logger;
 using TagFinder.Views.Pages;
 
 namespace TagFinder
@@ -11,11 +12,13 @@ namespace TagFinder
         public static PageManager PageManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
 
-        public static ILogger Logger = new FileLogger(FileNames.LOG_FILE);
+        public static ILogger Logger { get; } = new FileLogger(FileNames.LOG_FILE);
 
         public void Startup()
         {
             CreateAppFolders();
+
+            CheckUpdates();
 
             InstagramAPIService = new StandardInstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
@@ -27,7 +30,10 @@ namespace TagFinder
             SetStartingPage();
         }
 
-       
+        private void CheckUpdates()
+        {
+            
+        }
 
         private async void SetStartingPage()
         {

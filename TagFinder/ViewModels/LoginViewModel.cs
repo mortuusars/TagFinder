@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using TagFinder.InstagramAPI;
+using TagFinder.Logger;
 
 namespace TagFinder.ViewModels
 {
