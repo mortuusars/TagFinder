@@ -8,8 +8,7 @@ namespace TagFinder.Infrastructure
 {
     public class VersionManager
     {
-        //public string Version { get; private set; }
-        //public string WebVersion { get; private set; }
+        public string RecentChangelog { get; private set; }
 
         private readonly ILogger _logger;
 
@@ -85,7 +84,15 @@ namespace TagFinder.Infrastructure
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     _logger.Log("Got content from url: " + content);
-                    return content;
+
+                    content = content.Trim();
+
+                    var verString = content.Substring(0, 4);
+
+                    if (content.Length > 5)
+                        RecentChangelog = content.Substring(4).Trim();
+
+                    return verString;
                 }
                 else
                 {

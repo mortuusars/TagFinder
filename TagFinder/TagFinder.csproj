@@ -36,4 +36,16 @@
     <Resource Include="Resources\Images\user_48.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="updateDownloadPage.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="updateUrl.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="version.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

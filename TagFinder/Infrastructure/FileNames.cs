@@ -11,6 +11,8 @@ namespace TagFinder
 
         public const string VERSION_FILE = "version.txt";
         public const string UPDATE_URL_FILE = "updateUrl.txt";
+        public const string DOWNLOAD_URL_FILE = "updateDownloadPage.txt";
+       
 
         public const string LOG_FILE = "log.txt";
 

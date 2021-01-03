@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using TagFinder.Infrastructure;
 using TagFinder.InstagramAPI;
 using TagFinder.Logger;
@@ -19,7 +21,7 @@ namespace TagFinder
         {
             CreateAppFolders();
 
-            //CheckUpdates();
+            CheckUpdates();
 
             InstagramAPIService = new StandardInstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
@@ -31,10 +33,18 @@ namespace TagFinder
             SetStartingPage();
         }
 
-        private void CheckUpdates()
+        private async void CheckUpdates()
         {
             VersionManager versionManager = new VersionManager(Logger);
-            var result = versionManager.IsNewVersionAvailable(FileNames.VERSION_FILE, FileNames.UPDATE_URL_FILE);
+            var updateAvailable = await versionManager.IsNewVersionAvailable(FileNames.VERSION_FILE, FileNames.UPDATE_URL_FILE);
+
+            if (updateAvailable)
+            {
+                if (MessageBox.Show("New update available. Open download page?" + "\n" + versionManager.RecentChangelog, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                {
+                    Process.Start(File.ReadAllText(FileNames.DOWNLOAD_URL_FILE));
+                }
+            }
         }
 
         private async void SetStartingPage()
