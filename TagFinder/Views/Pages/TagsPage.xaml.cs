@@ -23,16 +23,67 @@ namespace TagFinder.Views.Pages
         public TagsPage()
         {
             InitializeComponent();
+
+            UsernameBox.Text = "mortuus_cg";
+        }
+
+        private void AddTagPlusButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedTagsButtonsPanel.Visibility = Visibility.Collapsed;
+
+            AddTagByNamePanel.Visibility = Visibility.Visible;
+            AddTagTextBox.Focus();
+        }
+
+        private async void ClearAndHideAddingTagByName(object sender, RoutedEventArgs e)
+        {
+            await Task.Delay(20);
+
+            AddTagTextBox.Text = string.Empty;
+            AddTagByNamePanel.Visibility = Visibility.Collapsed;
+
+            SelectedTagsButtonsPanel.Visibility = Visibility.Visible;
+        }
+
+        private void TextBoxNumberChange_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var box = (TextBox)sender;
+            //TODO Crash if letters in box
+
+            int currentNumber;
+            try
+            {
+                currentNumber = Convert.ToInt32(box.Text);
+            }
+            catch (Exception)
+            {
+                currentNumber = 2;
+            }
+
+            if (e.Delta > 0)
+            {
+                currentNumber++;
+            }
+            else
+            {
+                if (currentNumber <= 1)
+                    return;
+
+                currentNumber--;
+            }
+
+            box.Text = currentNumber.ToString();
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (AllTagsListBox.SelectedItem == null)
-                return;
+            var context = ((Button)sender).DataContext as TagRecord;
 
-            //((TagRecord)AllTagsListBox.SelectedItem).GetGlobalCountString();
+                AllTagsListBox.SelectedItems.Add(context);
 
-            //MessageBox.Show(result);
+                await Task.Delay(10);
+
+                AllTagsListBox.SelectedItems.Clear();
         }
     }
 }

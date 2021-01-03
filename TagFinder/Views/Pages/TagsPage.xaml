@@ -13,6 +13,8 @@
       FocusManager.FocusedElement="{Binding ElementName=UsernameBox}">
 
     <Page.Resources>
+
+        <!-- BUTTONS -->
         <Style x:Key="RedButton" TargetType="Button">
             <Setter Property="Background" Value="#ff6666"/>
             <Setter Property="Foreground" Value="White"/>
@@ -33,16 +35,45 @@
                     <Setter Property="Background" Value="#e94545"/>
                 </Trigger>
             </Style.Triggers>
-            
+
         </Style>
 
-        <Style x:Key="RoundTextBox" TargetType="TextBox">
-            <Style.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="{StaticResource RoundedCornerValue}"/>
-                </Style>
-            </Style.Resources>
+        <Style x:Key="BlueButton" TargetType="Button" BasedOn="{StaticResource RedButton}">
+            <Setter Property="Background" Value="#6FADD1"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A7F9E"/>
+                </Trigger>
+            </Style.Triggers>
+
         </Style>
+
+        <Style x:Key="AddItemButton" TargetType="Button" BasedOn="{StaticResource BlueButton}">
+            <Setter Property="Visibility" Value="Hidden"/>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True"/>
+                        <Condition Binding="{Binding IsSelected}" Value="False"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Visibility" Value="Visible"/>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RemoveItemButton" TargetType="Button" BasedOn="{StaticResource RedButton}">
+            <Setter Property="Visibility" Value="Hidden"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
 
         <Style x:Key="UserStatus" TargetType="StackPanel">
             <Setter Property="Opacity" Value="0"/>
@@ -74,6 +105,8 @@
         </Style>
 
 
+
+        <!-- USER PICTURE -->
         <Style x:Key="Ellipse" TargetType="Ellipse">
             <Setter Property="RenderTransformOrigin">
                 <Setter.Value>
@@ -101,12 +134,26 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
-        
-        
-        
-        
-        
+
+
+        <!-- TEXT -->
+        <Style x:Key="RoundTextBox" TargetType="TextBox">
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="{StaticResource RoundedCornerValue}"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <Style x:Key="TagTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Gray"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Foreground" Value="LightGray"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Page.Resources>
 
     <Grid x:Name="MainPanel"
@@ -139,16 +186,18 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Pages:"
+                               Margin="0 1 6 0"
                                Foreground="Gray"/>
                     <TextBox x:Name="PagesToLoadInput"
                              Width="30"
-                             Margin="4 -1 0 0"
                              Grid.Column="1"
                              Text="{Binding PagesToLoad, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Foreground="Gray"
                              BorderBrush="Gray"
                              HorizontalContentAlignment="Center"
-                             Style="{StaticResource RoundTextBox}"/>
+                             Style="{StaticResource RoundTextBox}"
+                             MouseWheel="TextBoxNumberChange_MouseWheel">
+                    </TextBox>
                 </Grid>
 
                 <Grid Grid.Column="1"
@@ -161,16 +210,17 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Tag limit:"
+                               Margin="0 1 6 0"
                                Foreground="Gray"/>
                     <TextBox x:Name="TagLimitInput"
                              Width="30"
-                             Margin="4 -1 0 0"
                              Grid.Column="1"
                              Text="{Binding TagLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Foreground="Gray"
                              BorderBrush="Gray"
                              HorizontalContentAlignment="Center"
-                             Style="{StaticResource RoundTextBox}"/>
+                             Style="{StaticResource RoundTextBox}"
+                             MouseWheel="TextBoxNumberChange_MouseWheel"/>
                 </Grid>
 
                 <Grid Grid.Column="2"
@@ -269,31 +319,44 @@
 
                     <ListBox x:Name="AllTagsListBox"
                              Background="Transparent"
+                             Margin="0 2"
                              BorderThickness="0"                             
                              ItemsSource="{Binding TagsList}"
                              SelectionMode="Extended"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                             HorizontalAlignment="Stretch"
                              HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid>
+                                <Grid Background="Transparent">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="8*"/>
-                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding Count}"
+                                               HorizontalAlignment="Left"
+                                               Margin="0"
+                                               Grid.Column="0"
+                                               Style="{StaticResource TagTextStyle}"/>
 
                                     <TextBlock Text="{Binding Name}"
                                                HorizontalAlignment="Left"
-                                               Foreground="Gray"/>
-
-                                    <TextBlock Text="{Binding Count}"
-                                               HorizontalAlignment="Right"
-                                               Margin="8 0"
                                                Grid.Column="1"
-                                               Foreground="Gray"/>
+                                               Margin="6 0 0 0"
+                                               Style="{StaticResource TagTextStyle}"/>
 
+                                    <Button Content=">"
+                                            FontSize="12"
+                                            Grid.Column="1"
+                                            Width="14"
+                                            Height="14"
+                                            HorizontalAlignment="Right"                                            
+                                            Style="{StaticResource AddItemButton}"
+                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type ListBox}}, Path=DataContext.AddListToSelectedCommand}"
+                                            CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}, Path=SelectedItems}"
+                                            Click="Button_Click"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -307,23 +370,137 @@
                         Margin="4"
                         CornerRadius="{StaticResource RoundedCornerValue}">
 
-                    <ListBox x:Name="SelectedTagsListBox"
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ListBox x:Name="SelectedTagsListBox"
                              ItemsSource="{Binding SelectedTagsList}"
+                             Grid.Row="0"
                              Background="Transparent"
+                             Margin="0 2"
                              BorderThickness="0"
                              SelectionMode="Extended"
+                             HorizontalContentAlignment="Stretch"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                              ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <TextBlock Text="{Binding Name}"
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="16"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding Name}"
                                                HorizontalAlignment="Left"
                                                Foreground="Gray"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+
+                                        <Button Content="X"
+                                            FontSize="10"
+                                            Grid.Column="1"
+                                            Height="14"
+                                            Width="14"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource RemoveItemButton}"
+                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                AncestorType={x:Type ListBox}}, Path=DataContext.RemoveItemFromSelectedCommand}"
+                                            CommandParameter="{Binding}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Grid x:Name="SelectedTagsButtonsPanel"
+                              VerticalAlignment="Bottom"
+                              Grid.Row="1"
+                              Margin="2"
+                              Visibility="Visible">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="Clear" 
+                                    Width="50"
+                                    Height="18"
+                                    FontSize="12"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Stretch"
+                                    Style="{StaticResource RedButton}"
+                                    Command="{Binding ClearSelectedCommand}"/>
+
+                            <Button Content="Copy"
+                                    Margin="2 0"
+                                    FontSize="12"
+                                    Height="18"
+                                    Grid.Column="1"
+                                    Style="{StaticResource BlueButton}"
+                                    Command="{Binding CopySelectedCommand}"/>
+
+                            <Button x:Name="AddTagPlusButton"
+                                    Content="+"
+                                    FontSize="16"
+                                    Width="18"
+                                    Height="18"
+                                    Grid.Column="2"
+                                    Style="{StaticResource BlueButton}"
+                                    Click="AddTagPlusButton_Click"/>
+
+                        </Grid>
+
+
+                        <Grid Name="AddTagByNamePanel"
+                              Grid.Row="1"
+                              VerticalAlignment="Top"
+                              Visibility="Collapsed"
+                              d:Visibility="Collapsed">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="CancelAddingTagByNameButton"
+                                    Content="X"
+                                    FontSize="12"
+                                    Margin="2"
+                                    Height="18"
+                                    Width="18"
+                                    Style="{StaticResource RedButton}"
+                                    Click="ClearAndHideAddingTagByName"/>
+
+                            <TextBox x:Name="AddTagTextBox"
+                                     Grid.Column="1"
+                                     Height="18.5"
+                                     Background="White"
+                                     Style="{StaticResource RoundTextBox}"/>
+
+                            <Button Content="Add"
+                                    Grid.Column="2"
+                                    Width="32"
+                                    FontSize="12"
+                                    Height="18"
+                                    HorizontalAlignment="Right"
+                                    Margin="2"
+                                    Style="{StaticResource BlueButton}"
+                                    Command="{Binding AddToSelectedByNameCommand}"
+                                    CommandParameter="{Binding ElementName=AddTagTextBox, Path=Text}"
+                                    Click="ClearAndHideAddingTagByName"/>
+
+                        </Grid>
+
+
+
+                    </Grid>
+
+
                 </Border>
 
             </Grid>
@@ -334,7 +511,8 @@
             <Grid x:Name="MiddleButtonsPanel"
                   Grid.Row="1"
                   Height="30"
-                  Margin="4">
+                  Margin="4"
+                  Visibility="Collapsed">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -343,31 +521,26 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Content="Clear"                        
-                        Style="{StaticResource RedButton}"
-                        Command="{Binding ClearSelectedCommand}"/>
+
                 <Button Content="Remove"
                         Grid.Column="1"
                         Margin="4 0 2 0"
                         Style="{StaticResource RedButton}"
-                        Command="{Binding RemoveSelectedCommand}"
+                        Command="{Binding RemoveListFromSelectedCommand}"
                         CommandParameter="{Binding ElementName=SelectedTagsListBox, Path=SelectedItems}"/>
                 <Button Content="Add"
                         Grid.Column="2"
                         Margin="2 0 4 0"
                         Style="{StaticResource RedButton}"
-                        Command="{Binding AddToSelectedCommand}"
+                        Command="{Binding AddListToSelectedCommand}"
                         CommandParameter="{Binding ElementName=AllTagsListBox, Path=SelectedItems}"/>
-                <Button Content="Copy"
-                        Grid.Column="3"
-                        Style="{StaticResource RedButton}"
-                        Command="{Binding CopySelectedCommand}"/>
 
-                <Button Content="Info"
+
+                <!--<Button Content="Info"
                         Visibility="Visible"
                         Grid.Column="4"
                         Style="{StaticResource RedButton}"
-                        Click="Button_Click"/>
+                        Click="Button_Click"/>-->
 
             </Grid>
 
@@ -403,7 +576,39 @@
 
                     <Ellipse.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Logout" Command="{Binding LogOutCommand}"/>
+                            <ContextMenu.Style>
+                                <Style TargetType="ContextMenu">
+                                    <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Border Background="LightGray"
+                                                        CornerRadius="{StaticResource RoundedCornerValue}"
+                                                        BorderBrush="Gray"
+                                                        BorderThickness="1">
+                                                    <StackPanel IsItemsHost="True"
+                                                                KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ContextMenu.Style>
+
+                            <MenuItem Header="Logout"
+                                      Command="{Binding LogOutCommand}">
+                                <MenuItem.Template>
+                                    <ControlTemplate TargetType="MenuItem">
+                                        <Grid Width="100"
+                                              Height="26"
+                                              Margin="2">
+                                            <Button Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Header}"
+                                                    Style="{StaticResource RedButton}"
+                                                    FontSize="16"/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </MenuItem.Template>
+                            </MenuItem>
                         </ContextMenu>
                     </Ellipse.ContextMenu>
 

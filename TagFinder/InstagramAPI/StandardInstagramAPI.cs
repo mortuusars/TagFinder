@@ -14,9 +14,6 @@ namespace TagFinder.InstagramAPI
 {
     public class StandardInstagramAPI : IInstagramAPI
     {
-        public event EventHandler LoggedIn;
-        public event EventHandler LoggedOut;
-
         public string CurrentUserName { get; private set; }
         public BitmapImage UserProfilePic { get; private set; }
 
@@ -401,5 +398,15 @@ namespace TagFinder.InstagramAPI
 
             return Utility.GetDefaultProfilePic();
         }
+
+        //public async Task<string> GetUserTags()
+        //{
+        //    var param = PaginationParameters.MaxPagesToLoad(5);
+        //    param. = 2;
+
+        //    var result = await _instaApi.UserProcessor.GetUserMediaAsync(CurrentUserName, param);
+
+        //    return "";
+        //}
     }
 }

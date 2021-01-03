@@ -9,9 +9,9 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Tag Finder"
-        MinWidth="300"
+        MinWidth="316"
         Width="400"
-        Height="540" 
+        Height="600" 
         ResizeMode="CanResize">
 
     <Window.Resources>
@@ -69,17 +69,47 @@
         <Frame x:Name="PageFrame"
                NavigationUIVisibility="Hidden"/>
 
+        <!--<Button Content="Button" Width="120" Height="50" Click="Button_Click"/>-->
+
         <Grid x:Name="OverlayPanel"
               Background="#99222222"
-              Style="{StaticResource Overlay}">
+              Style="{StaticResource Overlay}"
+              d:Visibility="Visible"
+              d:Opacity="1">
 
             <StackPanel VerticalAlignment="Center">
                 
-                <Image wpfanimated:ImageBehavior.AnimatedSource="../Resources/Images/loading_214.gif"
+                <!--<Image wpfanimated:ImageBehavior.AnimatedSource="../Resources/Images/loading_128.gif"
                    wpfanimated:ImageBehavior.AnimateInDesignMode="True"
                    wpfanimated:ImageBehavior.RepeatBehavior="1"
                    wpfanimated:ImageBehavior.AutoStart="True"
-                   Height="100"/>
+                   wpfanimated:ImageBehavior.AnimationSpeedRatio="4"
+                   Height="100"
+                   RenderOptions.BitmapScalingMode="Fant"/>-->
+
+                <Image Source="../Resources/Images/loading.png"
+                       Width="110"
+                       RenderTransformOrigin="0.5 0.5">
+                    <Image.RenderTransform>
+                        <RotateTransform x:Name="Spinning" Angle="90"/>
+                    </Image.RenderTransform>
+
+                    <Image.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="(RotateTransform.Angle)"
+                                                     Storyboard.TargetName="Spinning"
+                                                     From="90" To="450"
+                                                     Duration="0:0:0.6"
+                                                     RepeatBehavior="Forever">
+                                    </DoubleAnimation>
+
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Image.Triggers>
+                </Image>
 
                 <TextBlock Text="{Binding Status}"
                            d:Text="Logging in"

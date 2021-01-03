@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\loading.png" />
+    <None Remove="Resources\Images\loading_128.gif" />
     <None Remove="Resources\Images\loading_194.gif" />
     <None Remove="Resources\Images\loading_214.gif" />
     <None Remove="Resources\Images\loading_64.gif" />
@@ -16,6 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\loading.png" />
+    <Resource Include="Resources\Images\loading_128.gif" />
     <Resource Include="Resources\Images\loading_194.gif">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
