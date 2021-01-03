@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TagFinder.Logger;
 
@@ -8,7 +9,7 @@ namespace TagFinder.Infrastructure
 {
     public class VersionManager
     {
-        public string RecentChangelog { get; private set; }
+        public VersionInfo WebVersionInfo { get; private set; }
 
         private readonly ILogger _logger;
 
@@ -17,14 +18,29 @@ namespace TagFinder.Infrastructure
             this._logger = logger;
         }
 
-        public async Task<bool> IsNewVersionAvailable(Version currentVersion, string urlFile)
+        public void GenerateVersionJson()
         {
-            string webVerString = await GetWebVersionFromURL(urlFile);
-            Version webVersion = GetVersion(webVerString);
+            VersionInfo vi = new VersionInfo() { CurrentVersion = Program.APP_VERSION, ChangeLog = "#Added:\n-Checking for updates" };
 
-            return CheckVersion(currentVersion, webVersion);
+            File.WriteAllText(FileNames.CURRENT_VERSION_FILE, JsonSerializer.Serialize(vi, new JsonSerializerOptions() { WriteIndented = true }));
         }
 
+        /// <summary>
+        /// Checks version on the GitHub and returns <see langword="true"/> if newer version is available.
+        /// </summary>
+        /// <param name="currentVersion">Current version of the program.</param>
+        /// <param name="url">Url of the github file.</param>
+        /// <returns>Result of version comparison and info about new version.</returns>
+        public async Task<(bool isUpdateAvailable, VersionInfo info)> CheckNewVersion(Version currentVersion, string url)
+        {
+            VersionInfo webVersion = await GetWebVersionInfoFromURL(url);
+
+            return (CheckVersion(currentVersion, webVersion.CurrentVersion), webVersion);
+        }
+
+        /// <summary>
+        /// Compare current version with version on the web.
+        /// </summary>
         private static bool CheckVersion(Version currentVersion, Version webVersion)
         {
             if (webVersion == new Version() || currentVersion == new Version())
@@ -35,19 +51,19 @@ namespace TagFinder.Infrastructure
                 return false;
         }
 
-        private Version GetVersion(string version)
-        {
-            try
-            {
-                _logger.Log($"Parsing {version} to version...");
-                return Version.Parse(version);
-            }
-            catch (Exception ex)
-            {
-                _logger.Log("Cannot parse version: " + ex.Message);
-                return new Version(0, 0, 0);
-            }
-        }
+        //private Version GetVersion(string version)
+        //{
+        //    try
+        //    {
+        //        _logger.Log($"Parsing {version} to version...");
+        //        return Version.Parse(version);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.Log("Cannot parse version: " + ex.Message);
+        //        return new Version(0, 0, 0);
+        //    }
+        //}
 
         //private async Task<string> GetVersionFromFile(string versionFile)
         //{
@@ -67,35 +83,24 @@ namespace TagFinder.Infrastructure
         //    }
         //}
 
-        private async Task<string> GetWebVersionFromURL(string urlFile)
+        private async Task<VersionInfo> GetWebVersionInfoFromURL(string url)
         {
-            _logger.Log("Getting version from url...");
+            _logger.Log("Getting version from web url...");
 
             try
             {
-                string url = await File.ReadAllTextAsync(urlFile);
-
                 var client = new HttpClient();
                 var response = await client.GetAsync(url);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    _logger.Log("Got content from url: " + content);
-
-                    content = content.Trim();
-
-                    var verString = content.Substring(0, 5);
-
-                    if (content.Length > 5)
-                        RecentChangelog = content.Substring(5).Trim();
-
-                    return verString;
+                    return JsonSerializer.Deserialize<VersionInfo>(content);
                 }
                 else
                 {
-                    _logger.Log("Failed to retrieve version from url: " + response.StatusCode + response.ReasonPhrase);
-                    return string.Empty;
+                    _logger.Log("Failed to retrieve version from url: " + response.StatusCode + " " + response.ReasonPhrase);
+                    return new VersionInfo();
                 }
             }
             catch (Exception ex)
@@ -103,7 +108,7 @@ namespace TagFinder.Infrastructure
                 _logger.Log("Getting version from url failed: " + ex.Message);
             }
 
-            return string.Empty;
+            return new VersionInfo();
         }
     }
 }

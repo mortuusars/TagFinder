@@ -9,12 +9,14 @@ namespace TagFinder
 
         public const string CACHE_FOLDER = "Cache/";
 
-        public const string VERSION_FILE = "version.txt";
+        public const string CURRENT_VERSION_FILE = "version.json";
+        public const string CHANGELOG_FILE = "changelog.md";
         public const string UPDATE_URL_FILE = "updateUrl.txt";
         public const string DOWNLOAD_URL_FILE = "updateDownloadPage.txt";
-       
 
         public const string LOG_FILE = "log.txt";
+
+        public const string SETTINGS_FILE = "settings.json";
 
         public const string LAST_USER_FILEPATH = "Cache/lastUser.";
         public const string PAGES_TO_LOAD_FILEPATH = "Cache/pagesToLoad.";

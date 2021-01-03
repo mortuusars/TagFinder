@@ -11,19 +11,23 @@ namespace TagFinder
 {
     public class Program
     {
-        public static readonly Version APP_VERSION = new Version(0,1,2);
+        public static readonly Version APP_VERSION = new Version("0.1.2");
 
         public static ViewManager ViewManager { get; private set; }
         public static PageManager PageManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
 
+        public static Settings Settings { get; private set; }
         public static ILogger Logger { get; } = new FileLogger(FileNames.LOG_FILE);
 
         public void Startup()
         {
             CreateAppFolders();
 
-            CheckUpdates();
+            Settings = Settings.Load();
+
+            if (Settings.CheckForUpdates)
+                CheckUpdates();
 
             InstagramAPIService = new StandardInstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
@@ -38,25 +42,24 @@ namespace TagFinder
         private async void CheckUpdates()
         {
             VersionManager versionManager = new VersionManager(Logger);
-            var updateAvailable = await versionManager.IsNewVersionAvailable(APP_VERSION, FileNames.UPDATE_URL_FILE);
 
-            if (updateAvailable)
+            versionManager.GenerateVersionJson();
+
+            var versionCheckResult = await versionManager.CheckNewVersion(APP_VERSION, FileNames.UPDATE_URL_FILE);
+
+            if (versionCheckResult.isUpdateAvailable)
             {
-                if (MessageBox.Show("New update available. Open download page?\n\n" + versionManager.RecentChangelog, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                if (MessageBox.Show("New update available. Open download page?\n\n" + versionCheckResult.info.ChangeLog, "Tag Finder Update",
+                    MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                 {
+                    string url = File.ReadAllText(FileNames.DOWNLOAD_URL_FILE);
 
-                    if (File.Exists(FileNames.DOWNLOAD_URL_FILE))
+                    var ps = new ProcessStartInfo(url)
                     {
-                        string url = File.ReadAllText(FileNames.DOWNLOAD_URL_FILE);
-
-                        var ps = new ProcessStartInfo(url)
-                        {
-                            UseShellExecute = true,
-                            Verb = "open"
-                        };
-                        Process.Start(ps);
-                    }
-
+                        UseShellExecute = true,
+                        Verb = "open"
+                    };
+                    Process.Start(ps);
                 }
             }
         }
