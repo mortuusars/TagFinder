@@ -1,1 +1,1 @@
-﻿https://raw.githubusercontent.com/mortuusars/TagFinder/master/TagFinder/version.txt
+﻿https://github.com/mortuusars/TagFinder/releases/latest

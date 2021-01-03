@@ -41,6 +41,8 @@ namespace TagFinder.ViewModels
         public ICommand AddItemToSelectedCommand { get; }
         public ICommand AddToSelectedByNameCommand { get; }
         public ICommand CopySelectedCommand { get; }
+
+        public ICommand SettingsCommand { get; }
         public ICommand LogOutCommand { get; }
 
         private IInstagramAPI _instagramAPI;
@@ -61,7 +63,10 @@ namespace TagFinder.ViewModels
             AddListToSelectedCommand = new RelayCommand(items => AddListToSelected((System.Collections.IList)items));
             AddToSelectedByNameCommand = new RelayCommand(name => AddToSelectedByName((string)name));
             CopySelectedCommand = new RelayCommand(_ => CopyToClipboard());
+
+            SettingsCommand = new RelayCommand(_ => ViewManager.ShowSettingsView());
             LogOutCommand = new RelayCommand(_ => OnLogOutCommand());
+
 
             StatusManager.StatusChanged += (_, e) => Status = StatusManager.Status;
 

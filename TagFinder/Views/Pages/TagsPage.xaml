@@ -595,6 +595,20 @@
                                 </Style>
                             </ContextMenu.Style>
 
+                            <MenuItem Header="Settings"
+                                      Command="{Binding SettingsCommand}">
+                                <MenuItem.Template>
+                                    <ControlTemplate TargetType="MenuItem">
+                                        <Grid Width="100"
+                                              Height="26"
+                                              Margin="2">
+                                            <Button Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Header}"
+                                                    Style="{StaticResource RedButton}"
+                                                    FontSize="16"/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </MenuItem.Template>
+                            </MenuItem>
                             <MenuItem Header="Logout"
                                       Command="{Binding LogOutCommand}">
                                 <MenuItem.Template>

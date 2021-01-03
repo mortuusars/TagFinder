@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace TagFinder.Logger
 {
@@ -10,6 +11,21 @@ namespace TagFinder.Logger
         public FileLogger(string filePath)
         {
             _filePath = filePath;
+
+            CheckFileSize();
+        }
+
+        private void CheckFileSize()
+        {
+            var info = new FileInfo(_filePath);
+
+            if (info.Length > 10000)
+            {
+                var lines = File.ReadLines(_filePath).ToArray();
+                var lastLines = lines.Skip(Math.Max(0, lines.Length - 50));
+
+                File.WriteAllLines(_filePath, lastLines);
+            }
         }
 
         public void Log(string message)

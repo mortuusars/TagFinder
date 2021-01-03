@@ -48,7 +48,6 @@ namespace TagFinder.Views.Pages
         private void TextBoxNumberChange_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             var box = (TextBox)sender;
-            //TODO Crash if letters in box
 
             int currentNumber;
             try

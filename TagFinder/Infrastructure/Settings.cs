@@ -12,6 +12,13 @@ namespace TagFinder.Infrastructure
 
         public static Settings Load()
         {
+            if (!File.Exists(FileNames.SETTINGS_FILE))
+            {
+                var settings = new Settings();
+                settings.Save();
+                return settings;
+            }
+
             try
             {
                 return JsonSerializer.Deserialize<Settings>(File.ReadAllText(FileNames.SETTINGS_FILE));

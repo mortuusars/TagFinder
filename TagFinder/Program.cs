@@ -18,12 +18,13 @@ namespace TagFinder
         public static IInstagramAPI InstagramAPIService { get; private set; }
 
         public static Settings Settings { get; private set; }
-        public static ILogger Logger { get; } = new FileLogger(FileNames.LOG_FILE);
+        public static ILogger Logger { get; private set; }
 
         public void Startup()
         {
             CreateAppFolders();
 
+            Logger = new FileLogger(FileNames.LOG_FILE);
             Settings = Settings.Load();
 
             if (Settings.CheckForUpdates)
@@ -37,31 +38,6 @@ namespace TagFinder
             ViewManager.ShowMainView();
 
             SetStartingPage();
-        }
-
-        private async void CheckUpdates()
-        {
-            VersionManager versionManager = new VersionManager(Logger);
-
-            versionManager.GenerateVersionJson();
-
-            var versionCheckResult = await versionManager.CheckNewVersion(APP_VERSION, FileNames.UPDATE_URL_FILE);
-
-            if (versionCheckResult.isUpdateAvailable)
-            {
-                if (MessageBox.Show("New update available. Open download page?\n\n" + versionCheckResult.info.ChangeLog, "Tag Finder Update",
-                    MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
-                {
-                    string url = File.ReadAllText(FileNames.DOWNLOAD_URL_FILE);
-
-                    var ps = new ProcessStartInfo(url)
-                    {
-                        UseShellExecute = true,
-                        Verb = "open"
-                    };
-                    Process.Start(ps);
-                }
-            }
         }
 
         private async void SetStartingPage()
@@ -91,6 +67,39 @@ namespace TagFinder
 
             StatusManager.InProgress = false;
         }
+
+        #region Update
+
+        private async void CheckUpdates()
+        {
+            VersionManager versionManager = new VersionManager(Logger);
+
+            var (isUpdateAvailable, newVersion) = await versionManager.CheckNewVersion(APP_VERSION, FileNames.UPDATE_URL_FILE);
+
+            if (isUpdateAvailable)
+                ShowCanUpdateMessage(newVersion);
+        }
+
+        private static void ShowCanUpdateMessage(Version newVersion)
+        {
+            string message = "New update available. Open download page?\n" +
+                                $"Current version: {APP_VERSION}\nAvailable version: {newVersion}";
+
+            if (MessageBox.Show(message, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Information,
+                MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            {
+                string url = File.ReadAllText(FileNames.UPDATE_URL_FILE);
+
+                var ps = new ProcessStartInfo(url)
+                {
+                    UseShellExecute = true,
+                    Verb = "open"
+                };
+                Process.Start(ps);
+            }
+        }
+
+        #endregion
 
         private void CreateAppFolders()
         {

@@ -5,11 +5,16 @@ namespace TagFinder
 {
     public class ViewManager
     {
+        #region MainView
+
         public static MainView MainView { get; set; }
         public static MainViewModel MainViewModel { get; set; }
 
-        public void ShowMainView()
+        public static void ShowMainView()
         {
+            if (MainView != null)
+                return;
+
             MainViewModel = new MainViewModel();
 
             MainView = new MainView(Program.PageManager);
@@ -18,9 +23,27 @@ namespace TagFinder
             MainView.Show();
         }
 
-        public void CloseMainView()
+        public static void CloseMainView()
         {
-            MainView.Close();
+            MainView?.Close();
         }
+
+        #endregion
+
+        #region Settings
+
+
+
+        public static void ShowSettingsView()
+        {
+
+        }
+
+        public static void CloseSettingsView()
+        {
+
+        }
+
+        #endregion
     }
 }
