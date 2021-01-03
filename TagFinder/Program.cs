@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using TagFinder.Infrastructure;
 using TagFinder.InstagramAPI;
 using TagFinder.Logger;
 using TagFinder.Views.Pages;
@@ -18,7 +19,7 @@ namespace TagFinder
         {
             CreateAppFolders();
 
-            CheckUpdates();
+            //CheckUpdates();
 
             InstagramAPIService = new StandardInstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
@@ -32,7 +33,8 @@ namespace TagFinder
 
         private void CheckUpdates()
         {
-            
+            VersionManager versionManager = new VersionManager(Logger);
+            var result = versionManager.IsNewVersionAvailable(FileNames.VERSION_FILE, FileNames.UPDATE_URL_FILE);
         }
 
         private async void SetStartingPage()

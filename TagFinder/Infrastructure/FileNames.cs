@@ -9,6 +9,9 @@ namespace TagFinder
 
         public const string CACHE_FOLDER = "Cache/";
 
+        public const string VERSION_FILE = "version.txt";
+        public const string UPDATE_URL_FILE = "updateUrl.txt";
+
         public const string LOG_FILE = "log.txt";
 
         public const string LAST_USER_FILEPATH = "Cache/lastUser.";
