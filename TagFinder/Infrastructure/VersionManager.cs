@@ -17,11 +17,8 @@ namespace TagFinder.Infrastructure
             this._logger = logger;
         }
 
-        public async Task<bool> IsNewVersionAvailable(string versionFile, string urlFile)
+        public async Task<bool> IsNewVersionAvailable(Version currentVersion, string urlFile)
         {
-            string currentVerString = await GetVersionFromFile(versionFile);
-            Version currentVersion = GetVersion(currentVerString);
-
             string webVerString = await GetWebVersionFromURL(urlFile);
             Version webVersion = GetVersion(webVerString);
 
@@ -52,22 +49,23 @@ namespace TagFinder.Infrastructure
             }
         }
 
-        private async Task<string> GetVersionFromFile(string versionFile)
-        {
-            _logger.Log("Getting version from file...");
+        //private async Task<string> GetVersionFromFile(string versionFile)
+        //{
+        //    _logger.Log("Getting version from file...");
 
-            try
-            {
-                string ver = await File.ReadAllTextAsync(versionFile);
-                _logger.Log("Current version: " + ver);
-                return ver;
-            }
-            catch (Exception)
-            {
-                _logger.Log("Failed to read version from file");
-                return string.Empty;
-            }
-        }
+        //    try
+        //    {
+        //        string ver = await File.ReadAllTextAsync(versionFile);
+        //        ver = ver.Trim().Substring(0, 5);
+        //        _logger.Log("Current version: " + ver);
+        //        return ver;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        _logger.Log("Failed to read version from file");
+        //        return string.Empty;
+        //    }
+        //}
 
         private async Task<string> GetWebVersionFromURL(string urlFile)
         {
@@ -87,10 +85,10 @@ namespace TagFinder.Infrastructure
 
                     content = content.Trim();
 
-                    var verString = content.Substring(0, 4);
+                    var verString = content.Substring(0, 5);
 
                     if (content.Length > 5)
-                        RecentChangelog = content.Substring(4).Trim();
+                        RecentChangelog = content.Substring(5).Trim();
 
                     return verString;
                 }

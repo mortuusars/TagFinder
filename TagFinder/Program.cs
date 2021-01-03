@@ -11,6 +11,8 @@ namespace TagFinder
 {
     public class Program
     {
+        public static readonly Version APP_VERSION = new Version(0,1,0);
+
         public static ViewManager ViewManager { get; private set; }
         public static PageManager PageManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
@@ -36,13 +38,25 @@ namespace TagFinder
         private async void CheckUpdates()
         {
             VersionManager versionManager = new VersionManager(Logger);
-            var updateAvailable = await versionManager.IsNewVersionAvailable(FileNames.VERSION_FILE, FileNames.UPDATE_URL_FILE);
+            var updateAvailable = await versionManager.IsNewVersionAvailable(APP_VERSION, FileNames.UPDATE_URL_FILE);
 
             if (updateAvailable)
             {
-                if (MessageBox.Show("New update available. Open download page?" + "\n" + versionManager.RecentChangelog, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                if (MessageBox.Show("New update available. Open download page?\n\n" + versionManager.RecentChangelog, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                 {
-                    Process.Start(File.ReadAllText(FileNames.DOWNLOAD_URL_FILE));
+
+                    if (File.Exists(FileNames.DOWNLOAD_URL_FILE))
+                    {
+                        string url = File.ReadAllText(FileNames.DOWNLOAD_URL_FILE);
+
+                        var ps = new ProcessStartInfo(url)
+                        {
+                            UseShellExecute = true,
+                            Verb = "open"
+                        };
+                        Process.Start(ps);
+                    }
+
                 }
             }
         }
