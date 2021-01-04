@@ -118,7 +118,12 @@ namespace TagFinder.ViewModels
             if (list == null)
             {
                 IsContentAvailable = false;
-                StatusManager.Status = "Getting tags failed";
+
+                if (!Utility.CheckInternetAvailability())
+                    StatusManager.Status = "Not connected to internet";
+                else 
+                    StatusManager.Status = "Getting tags failed";
+
                 return;
             }
 
