@@ -24,7 +24,7 @@ namespace TagFinder.Views.Pages
         {
             InitializeComponent();
 
-            UsernameBox.Text = "mortuus_cg";
+            //UsernameBox.Text = "mortuus_cg";
         }
 
         private void AddTagPlusButton_Click(object sender, RoutedEventArgs e)
