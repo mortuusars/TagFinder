@@ -518,7 +518,7 @@
 
 
 
-            <Grid x:Name="MiddleButtonsPanel"
+            <!--<Grid x:Name="MiddleButtonsPanel"
                   Grid.Row="1"
                   Height="30"
                   Margin="4"
@@ -546,13 +546,13 @@
                         CommandParameter="{Binding ElementName=AllTagsListBox, Path=SelectedItems}"/>
 
 
-                <!--<Button Content="Info"
+                --><!--<Button Content="Info"
                         Visibility="Visible"
                         Grid.Column="4"
                         Style="{StaticResource RedButton}"
-                        Click="Button_Click"/>-->
+                        Click="Button_Click"/>--><!--
 
-            </Grid>
+            </Grid>-->
 
         </Grid>
 
