@@ -15,6 +15,7 @@
             <conv:LengthToVisibilityConverter x:Key="LengthToVisibility"/>
             <conv:TextToPasswordConverter x:Key="TextToPassword"/>
             <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <conv:CountForegroundConverter x:Key="CountForegroundConverter"/>
 
             <CornerRadius x:Key="RoundedCornerValue">2</CornerRadius>
             

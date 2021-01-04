@@ -11,7 +11,7 @@ namespace TagFinder
 {
     public class Program
     {
-        public static readonly Version APP_VERSION = new Version("0.1.2");
+        public static readonly Version APP_VERSION = new Version("0.1.3");
 
         public static ViewManager ViewManager { get; private set; }
         public static PageManager PageManager { get; private set; }

@@ -27,7 +27,7 @@ namespace TagFinder.ViewModels
         public bool IncludeGlobalCount { get; set; } = false;
 
         public string Status { get; set; } = StatusManager.Status;
-        public string SelectedCount { get; set; }
+        public int SelectedCount { get; set; }
 
         public bool IsUserInfoAvailable { get; set; }
         public string LoggedUsername { get; set; }
@@ -82,7 +82,7 @@ namespace TagFinder.ViewModels
 
         private void OnSelectedChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SelectedCount = SelectedTagsList.Count > 0 ? SelectedTagsList.Count.ToString() : "";
+            SelectedCount = SelectedTagsList.Count > 0 ? SelectedTagsList.Count : 0;
         }
 
         private async void OnLogOutCommand()
@@ -118,7 +118,12 @@ namespace TagFinder.ViewModels
             if (list == null)
             {
                 IsContentAvailable = false;
-                StatusManager.Status = "Getting tags failed";
+
+                if (!Utility.CheckInternetAvailability())
+                    StatusManager.Status = "Not connected to internet";
+                else 
+                    StatusManager.Status = "Getting tags failed";
+
                 return;
             }
 

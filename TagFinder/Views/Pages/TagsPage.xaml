@@ -154,6 +154,16 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="TagCountStyle" TargetType="TextBlock" BasedOn="{StaticResource TagTextStyle}">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Page.Resources>
 
     <Grid x:Name="MainPanel"
@@ -168,7 +178,7 @@
         <!-- GET TAGS -->
         <StackPanel x:Name="GetTagspanel"
               Grid.Row="0"
-              Margin="5">
+              Margin="6">
 
             <Grid x:Name="OptionsPanel">
                 <Grid.ColumnDefinitions>
@@ -223,7 +233,7 @@
                              MouseWheel="TextBoxNumberChange_MouseWheel"/>
                 </Grid>
 
-                <Grid Grid.Column="2"
+                <!--<Grid Grid.Column="2"
                       Margin="6 0">
                     <Grid.ToolTip>
                         <ToolTip Content="Include total number of posts with hashtag. Drastically increases load times."/>
@@ -250,7 +260,7 @@
                             </Style>
                         </CheckBox.Style>
                     </CheckBox>
-                </Grid>
+                </Grid>-->
 
             </Grid>
 
@@ -263,7 +273,7 @@
 
                 <TextBox x:Name="UsernameBox"
                          Foreground="Gray"
-                         Margin="0 0 8 0"
+                         Margin="0 0 6 0"
                          VerticalContentAlignment="Center"
                          Padding="4 0 0 0"
                          BorderBrush="Gray"
@@ -298,6 +308,7 @@
 
         <Grid x:Name="MiddlePanel"
               Grid.Row="1"
+              Margin="6 0"
               Visibility="{Binding IsContentAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
 
             <Grid.RowDefinitions>
@@ -314,12 +325,12 @@
                 <Border Background="#f6f6f6"
                     BorderThickness="1"
                     BorderBrush="Gray"
-                    Margin="4"
+                    Margin="0 0 3 0"
                     CornerRadius="{StaticResource RoundedCornerValue}">
 
                     <ListBox x:Name="AllTagsListBox"
+                             Margin="0 2 0 0"
                              Background="Transparent"
-                             Margin="0 2"
                              BorderThickness="0"                             
                              ItemsSource="{Binding TagsList}"
                              SelectionMode="Extended"
@@ -330,25 +341,23 @@
                             <DataTemplate>
                                 <Grid Background="Transparent">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Count}"
+                                    <TextBlock Text="{Binding Name}"
                                                HorizontalAlignment="Left"
-                                               Margin="0"
                                                Grid.Column="0"
                                                Style="{StaticResource TagTextStyle}"/>
 
-                                    <TextBlock Text="{Binding Name}"
-                                               HorizontalAlignment="Left"
+                                    <TextBlock Text="{Binding Count}"
+                                               HorizontalAlignment="Right"
                                                Grid.Column="1"
-                                               Margin="6 0 0 0"
-                                               Style="{StaticResource TagTextStyle}"/>
+                                               Style="{StaticResource TagTextStyle}"/>                                    
 
                                     <Button Content=">"
-                                            FontSize="12"
                                             Grid.Column="1"
+                                            FontSize="12"
                                             Width="14"
                                             Height="14"
                                             HorizontalAlignment="Right"                                            
@@ -367,7 +376,7 @@
                         Grid.Column="1"
                         BorderThickness="1"
                         BorderBrush="Gray"
-                        Margin="4"
+                        Margin="3 0 0 0"
                         CornerRadius="{StaticResource RoundedCornerValue}">
 
                     <Grid>
@@ -380,7 +389,7 @@
                              ItemsSource="{Binding SelectedTagsList}"
                              Grid.Row="0"
                              Background="Transparent"
-                             Margin="0 2"
+                             Margin="0 2 0 0"
                              BorderThickness="0"
                              SelectionMode="Extended"
                              HorizontalContentAlignment="Stretch"
@@ -415,42 +424,35 @@
                         </ListBox>
 
                         <Grid x:Name="SelectedTagsButtonsPanel"
-                              VerticalAlignment="Bottom"
                               Grid.Row="1"
-                              Margin="2"
+                              VerticalAlignment="Bottom"
+                              Margin="4"
+                              Height="20"
                               Visibility="Visible">
 
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Content="Clear" 
-                                    Width="50"
-                                    Height="18"
-                                    FontSize="12"
-                                    Grid.Column="0"
-                                    HorizontalAlignment="Stretch"
+                            <Button Name="ClearTagsButton"
+                                    FontSize="13"
                                     Style="{StaticResource RedButton}"
-                                    Command="{Binding ClearSelectedCommand}"/>
+                                    Command="{Binding ClearSelectedCommand}">Clear</Button>
 
-                            <Button Content="Copy"
-                                    Margin="2 0"
-                                    FontSize="12"
-                                    Height="18"
+                            <Button Name="CopyTagsButton"
                                     Grid.Column="1"
+                                    Margin="3 0"
+                                    FontSize="13"
                                     Style="{StaticResource BlueButton}"
-                                    Command="{Binding CopySelectedCommand}"/>
+                                    Command="{Binding CopySelectedCommand}">Copy</Button>
 
-                            <Button x:Name="AddTagPlusButton"
-                                    Content="+"
-                                    FontSize="16"
-                                    Width="18"
-                                    Height="18"
+                            <Button Name="AddTagByNameButton"
                                     Grid.Column="2"
+                                    FontSize="16"
                                     Style="{StaticResource BlueButton}"
-                                    Click="AddTagPlusButton_Click"/>
+                                    Click="AddTagPlusButton_Click">+</Button>
 
                         </Grid>
 
@@ -508,7 +510,7 @@
 
 
 
-            <Grid x:Name="MiddleButtonsPanel"
+            <!--<Grid x:Name="MiddleButtonsPanel"
                   Grid.Row="1"
                   Height="30"
                   Margin="4"
@@ -536,13 +538,13 @@
                         CommandParameter="{Binding ElementName=AllTagsListBox, Path=SelectedItems}"/>
 
 
-                <!--<Button Content="Info"
+                --><!--<Button Content="Info"
                         Visibility="Visible"
                         Grid.Column="4"
                         Style="{StaticResource RedButton}"
-                        Click="Button_Click"/>-->
+                        Click="Button_Click"/>--><!--
 
-            </Grid>
+            </Grid>-->
 
         </Grid>
 
@@ -550,7 +552,7 @@
         <!-- STATUS -->
         <Grid x:Name="StatusPanel"
               Grid.Row="2"
-              Margin="4">
+              Margin="6 6 6 4">
 
             <TextBlock x:Name="StatusText"
                        Text="{Binding Status}"
@@ -563,8 +565,8 @@
                         HorizontalAlignment="Right"
                         d:Opacity="1">
 
-                <Ellipse Width="32"
-                         Height="32"
+                <Ellipse Width="30"
+                         Height="30"
                          StrokeThickness="2"
                          Stroke="#ff6666" 
                          RenderOptions.BitmapScalingMode="HighQuality"
@@ -636,7 +638,18 @@
                        d:Text="20"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Bottom"
-                       Foreground="Gray"/>
+                       Foreground="{Binding SelectedCount, Converter={StaticResource CountForegroundConverter}}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedCount}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
         </Grid>
     </Grid>
