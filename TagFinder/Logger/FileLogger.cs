@@ -12,11 +12,16 @@ namespace TagFinder.Logger
         {
             _filePath = filePath;
 
+
+
             CheckFileSize();
         }
 
         private void CheckFileSize()
         {
+            if (!File.Exists(_filePath))
+                File.WriteAllText(_filePath, "");
+
             var info = new FileInfo(_filePath);
 
             if (info.Length > 10000)

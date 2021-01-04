@@ -15,10 +15,10 @@ namespace TagFinder
 
         private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            Program.Logger.Log("EXCEPTION: " + e.Exception.Message + "\n" + e.Exception.StackTrace);
             MessageBox.Show("Tag Finder encountered an exception: " + e.Exception.Message + "\n Program will exit.", "Tag Finder",
                 MessageBoxButton.OK, MessageBoxImage.Error);
 
+            Program.Logger.Log("EXCEPTION: " + e.Exception.Message + "\n" + e.Exception.StackTrace);
             this.Shutdown();
         }
     }
