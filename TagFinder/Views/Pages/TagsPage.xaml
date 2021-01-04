@@ -223,7 +223,7 @@
                              MouseWheel="TextBoxNumberChange_MouseWheel"/>
                 </Grid>
 
-                <Grid Grid.Column="2"
+                <!--<Grid Grid.Column="2"
                       Margin="6 0">
                     <Grid.ToolTip>
                         <ToolTip Content="Include total number of posts with hashtag. Drastically increases load times."/>
@@ -250,7 +250,7 @@
                             </Style>
                         </CheckBox.Style>
                     </CheckBox>
-                </Grid>
+                </Grid>-->
 
             </Grid>
 
