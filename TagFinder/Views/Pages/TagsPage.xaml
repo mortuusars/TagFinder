@@ -154,6 +154,16 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="TagCountStyle" TargetType="TextBlock" BasedOn="{StaticResource TagTextStyle}">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                    <Setter Property="Visibility" Value="Hidden"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
     </Page.Resources>
 
     <Grid x:Name="MainPanel"
@@ -330,21 +340,21 @@
                             <DataTemplate>
                                 <Grid Background="Transparent">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="auto"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Count}"
-                                               HorizontalAlignment="Left"
-                                               Margin="0"
-                                               Grid.Column="0"
-                                               Style="{StaticResource TagTextStyle}"/>
-
                                     <TextBlock Text="{Binding Name}"
                                                HorizontalAlignment="Left"
-                                               Grid.Column="1"
+                                               Grid.Column="0"
                                                Margin="6 0 0 0"
                                                Style="{StaticResource TagTextStyle}"/>
+
+                                    <TextBlock Text="{Binding Count}"
+                                               HorizontalAlignment="Right"
+                                               Margin="0"
+                                               Grid.Column="1"
+                                               Style="{StaticResource TagTextStyle}"/>                                    
 
                                     <Button Content=">"
                                             FontSize="12"
