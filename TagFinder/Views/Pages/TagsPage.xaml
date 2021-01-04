@@ -178,7 +178,7 @@
         <!-- GET TAGS -->
         <StackPanel x:Name="GetTagspanel"
               Grid.Row="0"
-              Margin="5">
+              Margin="6">
 
             <Grid x:Name="OptionsPanel">
                 <Grid.ColumnDefinitions>
@@ -273,7 +273,7 @@
 
                 <TextBox x:Name="UsernameBox"
                          Foreground="Gray"
-                         Margin="0 0 8 0"
+                         Margin="0 0 6 0"
                          VerticalContentAlignment="Center"
                          Padding="4 0 0 0"
                          BorderBrush="Gray"
@@ -308,6 +308,7 @@
 
         <Grid x:Name="MiddlePanel"
               Grid.Row="1"
+              Margin="6 0"
               Visibility="{Binding IsContentAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
 
             <Grid.RowDefinitions>
@@ -324,12 +325,12 @@
                 <Border Background="#f6f6f6"
                     BorderThickness="1"
                     BorderBrush="Gray"
-                    Margin="4"
+                    Margin="0 0 3 0"
                     CornerRadius="{StaticResource RoundedCornerValue}">
 
                     <ListBox x:Name="AllTagsListBox"
+                             Margin="0 2 0 0"
                              Background="Transparent"
-                             Margin="0 2"
                              BorderThickness="0"                             
                              ItemsSource="{Binding TagsList}"
                              SelectionMode="Extended"
@@ -347,18 +348,16 @@
                                     <TextBlock Text="{Binding Name}"
                                                HorizontalAlignment="Left"
                                                Grid.Column="0"
-                                               Margin="6 0 0 0"
                                                Style="{StaticResource TagTextStyle}"/>
 
                                     <TextBlock Text="{Binding Count}"
                                                HorizontalAlignment="Right"
-                                               Margin="0"
                                                Grid.Column="1"
                                                Style="{StaticResource TagTextStyle}"/>                                    
 
                                     <Button Content=">"
-                                            FontSize="12"
                                             Grid.Column="1"
+                                            FontSize="12"
                                             Width="14"
                                             Height="14"
                                             HorizontalAlignment="Right"                                            
@@ -377,7 +376,7 @@
                         Grid.Column="1"
                         BorderThickness="1"
                         BorderBrush="Gray"
-                        Margin="4"
+                        Margin="3 0 0 0"
                         CornerRadius="{StaticResource RoundedCornerValue}">
 
                     <Grid>
@@ -390,7 +389,7 @@
                              ItemsSource="{Binding SelectedTagsList}"
                              Grid.Row="0"
                              Background="Transparent"
-                             Margin="0 2"
+                             Margin="0 2 0 0"
                              BorderThickness="0"
                              SelectionMode="Extended"
                              HorizontalContentAlignment="Stretch"
@@ -553,7 +552,7 @@
         <!-- STATUS -->
         <Grid x:Name="StatusPanel"
               Grid.Row="2"
-              Margin="4">
+              Margin="6 6 6 4">
 
             <TextBlock x:Name="StatusText"
                        Text="{Binding Status}"
@@ -566,8 +565,8 @@
                         HorizontalAlignment="Right"
                         d:Opacity="1">
 
-                <Ellipse Width="32"
-                         Height="32"
+                <Ellipse Width="30"
+                         Height="30"
                          StrokeThickness="2"
                          Stroke="#ff6666" 
                          RenderOptions.BitmapScalingMode="HighQuality"
