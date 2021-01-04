@@ -638,7 +638,18 @@
                        d:Text="20"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Bottom"
-                       Foreground="Gray"/>
+                       Foreground="{Binding SelectedCount, Converter={StaticResource CountForegroundConverter}}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedCount}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
         </Grid>
     </Grid>
