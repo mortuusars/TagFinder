@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="TagFinder.Views.Controls.AddCustomHashtag"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TagFinder.Views.Controls"
+             xmlns:app="clr-namespace:TagFinder"
+             mc:Ignorable="d" 
+             d:DesignHeight="130" d:DesignWidth="260"
+             FontSize="16"
+             FontFamily="{StaticResource MontserratRegular}">
+
+    <Border Background="#efefef" 
+            BorderThickness="2"
+            BorderBrush="#6FADD1"
+            Margin="16"
+            CornerRadius="{StaticResource RoundedCornerValue}">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-90" Opacity="0.25"/>
+        </Border.Effect>
+
+        <Grid Margin="6 6">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Add tag:"
+                       VerticalAlignment="Bottom"
+                       Foreground="Gray"/>
+
+            <TextBox x:Name="AddTagTextBox"
+                     Grid.Row="1"
+                     Margin="0 4 0 0"
+                     Padding="4 3"
+                     Background="White"
+                     Foreground="SlateGray"
+                     Style="{StaticResource RoundTextBox}"
+                     Validation.ErrorTemplate="{StaticResource ErrorTemplate}">                
+                <TextBox.Text>
+                    <Binding Path="CustomTag" 
+                             ValidatesOnDataErrors="True"
+                             UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <app:NoSpacesRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding AddCustomTagCommand}"/>
+                </TextBox.InputBindings>
+            </TextBox>
+            
+
+            <!-- Buttons -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.6*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Margin="0 6 3 0"
+                        Height="24"
+                        SnapsToDevicePixels="True"
+                        Style="{StaticResource RedButton}"
+                        Command="{Binding CloseAddingCustomTagCommand}">Close</Button>
+
+                <Button Grid.Column="1"
+                        Margin="3 6 0 0"
+                        Style="{StaticResource BlueButton}"
+                        Command="{Binding AddCustomTagCommand}">Add</Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

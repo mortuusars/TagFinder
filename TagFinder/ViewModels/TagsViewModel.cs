@@ -33,7 +33,8 @@ namespace TagFinder.ViewModels
         public string LoggedUsername { get; set; }
         public BitmapImage UserProfilePic { get; set; } = Utility.GetDefaultProfilePic();
 
-        public string CustomHashtag { get; set; }
+        public bool ShowingCustomTagPanel { get; set; }
+        public string CustomTag { get; set; }
 
         public ICommand GetTagsCommand { get; }
         public ICommand ClearSelectedCommand { get; }
@@ -41,8 +42,11 @@ namespace TagFinder.ViewModels
         public ICommand RemoveListFromSelectedCommand { get; }
         public ICommand AddListToSelectedCommand { get; }
         public ICommand AddItemToSelectedCommand { get; }
-        public ICommand AddToSelectedByNameCommand { get; }
+        public ICommand AddCustomTagCommand { get; }
         public ICommand CopySelectedCommand { get; }
+
+        public ICommand ShowAddTagPanelCommand { get; }
+        public ICommand CloseAddingCustomTagCommand { get; }
 
         public ICommand SettingsCommand { get; }
         public ICommand LogOutCommand { get; }
@@ -51,24 +55,33 @@ namespace TagFinder.ViewModels
         private PageManager _pageManager;
         private ILogger _logger;
 
+
+
         public TagsViewModel(IInstagramAPI instagramAPI, PageManager pageManager, ILogger logger)
         {
             _instagramAPI = instagramAPI;
             _pageManager = pageManager;
             _logger = logger;
 
+            #region Commands
+
             GetTagsCommand = new RelayCommand(username => OnGetTagsCommand((string)username));
+
             ClearSelectedCommand = new RelayCommand(_ => RemoveListFromSelectedItems(SelectedTagsList));
             RemoveItemFromSelectedCommand = new RelayCommand(item => RemoveItemFromSelected((TagRecord)item));
             RemoveListFromSelectedCommand = new RelayCommand(items => RemoveListFromSelectedItems((System.Collections.IList)items));
             AddItemToSelectedCommand = new RelayCommand(item => AddItemToSelected((TagRecord)item));
             AddListToSelectedCommand = new RelayCommand(items => AddListToSelected((System.Collections.IList)items));
-            AddToSelectedByNameCommand = new RelayCommand(name => AddToSelectedByName((string)name));
             CopySelectedCommand = new RelayCommand(_ => CopyToClipboard());
+
+            ShowAddTagPanelCommand = new RelayCommand(_ => ShowingCustomTagPanel = !ShowingCustomTagPanel);
+            AddCustomTagCommand = new RelayCommand(_ => AddCustomTag(CustomTag), canEx => CanAddCustomTag(CustomTag));
+            CloseAddingCustomTagCommand = new RelayCommand(_ => { ShowingCustomTagPanel = false; CustomTag = string.Empty; });
 
             SettingsCommand = new RelayCommand(_ => ViewManager.ShowSettingsView());
             LogOutCommand = new RelayCommand(_ => OnLogOutCommand());
 
+            #endregion
 
             StatusManager.StatusChanged += (_, e) => Status = StatusManager.Status;
 
@@ -167,7 +180,7 @@ namespace TagFinder.ViewModels
             }
         }
 
-        private void AddToSelectedByName(string name)
+        private void AddCustomTag(string name)
         {
 
             if (string.IsNullOrWhiteSpace(name))
@@ -175,8 +188,6 @@ namespace TagFinder.ViewModels
                 //TODO error to user
                 return;
             }
-
-            name = name.Trim();
 
             name = name.StartsWith('#') ? name : '#' + name;
 
@@ -198,6 +209,8 @@ namespace TagFinder.ViewModels
 
             SelectedTagsList.Add(new TagRecord() { Name = name });
         }
+
+        private bool CanAddCustomTag(string customTag) => !string.IsNullOrWhiteSpace(customTag);
 
         #endregion        
 
