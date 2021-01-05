@@ -11,6 +11,7 @@ namespace TagFinder
 {
     public class Program
     {
+        public const string APP_NAME = "TagFinder";
         public static readonly Version APP_VERSION = new Version("0.1.3");
 
         public static ViewManager ViewManager { get; private set; }
@@ -103,8 +104,8 @@ namespace TagFinder
 
         private void CreateAppFolders()
         {
-            Directory.CreateDirectory(FileNames.CACHE_FOLDER);
-            Directory.CreateDirectory(FileNames.LOCAL_FOLDER + "/TagFinder/");
+            Directory.CreateDirectory(FileNames.CACHE);
+            Directory.CreateDirectory(FileNames.APPLOCAL_FOLDER);
         }
     }
 }
