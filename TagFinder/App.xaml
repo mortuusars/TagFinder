@@ -5,7 +5,7 @@
              xmlns:conv="clr-namespace:TagFinder.ViewModels.Converters"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              Startup="Application_Startup">
-    <Application.Resources>
+    <Application.Resources>        
         <ResourceDictionary>
 
             <ResourceDictionary.MergedDictionaries>
@@ -18,7 +18,19 @@
             <conv:CountForegroundConverter x:Key="CountForegroundConverter"/>
 
             <CornerRadius x:Key="RoundedCornerValue">2</CornerRadius>
-            
-        </ResourceDictionary>
+
+            <ControlTemplate x:Key="ErrorTemplate">
+                <Border BorderBrush="#e12d1a" BorderThickness="1.5" CornerRadius="{StaticResource RoundedCornerValue}">
+                    <Grid>
+                        <AdornedElementPlaceholder/>
+                        <TextBlock Text="{Binding [0].ErrorContent}"
+                               Foreground="#e12d1a"
+                               VerticalAlignment="Center" HorizontalAlignment="Right"
+                               Margin="0 0 2 0"/>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+
+        </ResourceDictionary>        
     </Application.Resources>
 </Application>

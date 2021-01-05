@@ -33,6 +33,8 @@ namespace TagFinder.ViewModels
         public string LoggedUsername { get; set; }
         public BitmapImage UserProfilePic { get; set; } = Utility.GetDefaultProfilePic();
 
+        public string CustomHashtag { get; set; }
+
         public ICommand GetTagsCommand { get; }
         public ICommand ClearSelectedCommand { get; }
         public ICommand RemoveItemFromSelectedCommand { get; }

@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TagFinder.Views.Pages"
+      xmlns:app="clr-namespace:TagFinder"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="360"
       Title="TagsPage"
@@ -482,7 +483,18 @@
                                      Grid.Column="1"
                                      Height="18.5"
                                      Background="White"
-                                     Style="{StaticResource RoundTextBox}"/>
+                                     Style="{StaticResource RoundTextBox}"
+                                     Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="CustomHashtag" 
+                                             ValidatesOnDataErrors="True"
+                                             UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <app:NoSpacesRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
 
                             <Button Content="Add"
                                     Grid.Column="2"
