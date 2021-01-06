@@ -11,7 +11,7 @@
       d:DesignHeight="450" d:DesignWidth="360"
       Title="TagsPage"
       d:Background="White"
-      FontFamily="{StaticResource MontserratRegular}"
+      FontFamily="{StaticResource MontserratLight}"
       FontSize="14"
       FocusManager.FocusedElement="{Binding ElementName=UsernameBox}"
       SnapsToDevicePixels="True"
@@ -282,10 +282,6 @@
               Margin="6 0"
               Visibility="{Binding IsContentAvailable, Converter={StaticResource BoolToVisibilityConverter}}">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
             <Grid x:Name="ListsPanel">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.2*"/>
@@ -492,12 +488,11 @@
 
 
 
-            <Grid Margin="40"
+            <Grid Margin="0 0 0 31.7"
                   VerticalAlignment="Bottom"
                   MaxWidth="400">
 
                 <UserControl Name="AddCustomTagControl"
-                             Grid.Row="1"
                              FontFamily="{StaticResource MontserratRegular}"
                              Visibility="{Binding ShowingCustomTagPanel, 
                                 Converter={StaticResource BoolToVisibilityConverter}}">
