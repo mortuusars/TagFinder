@@ -9,7 +9,8 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Tag Finder"
-        MinWidth="316"
+        MinWidth="280"
+        MinHeight="350"
         Width="400"
         Height="600" 
         ResizeMode="CanResize">

@@ -23,26 +23,6 @@ namespace TagFinder.Views.Pages
         public TagsPage()
         {
             InitializeComponent();
-
-            //UsernameBox.Text = "mortuus_cg";
-        }
-
-        private void AddTagPlusButton_Click(object sender, RoutedEventArgs e)
-        {
-            SelectedTagsButtonsPanel.Visibility = Visibility.Collapsed;
-
-            AddTagByNamePanel.Visibility = Visibility.Visible;
-            AddTagTextBox.Focus();
-        }
-
-        private async void ClearAndHideAddingTagByName(object sender, RoutedEventArgs e)
-        {
-            await Task.Delay(20);
-
-            AddTagTextBox.Text = string.Empty;
-            AddTagByNamePanel.Visibility = Visibility.Collapsed;
-
-            SelectedTagsButtonsPanel.Visibility = Visibility.Visible;
         }
 
         private void TextBoxNumberChange_MouseWheel(object sender, MouseWheelEventArgs e)

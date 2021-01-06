@@ -4,50 +4,28 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:TagFinder.Views.Pages"
+      xmlns:controls="clr-namespace:TagFinder.Views.Controls"
+      xmlns:app="clr-namespace:TagFinder"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="360"
       Title="TagsPage"
       d:Background="White"
       FontFamily="{StaticResource MontserratRegular}"
       FontSize="14"
-      FocusManager.FocusedElement="{Binding ElementName=UsernameBox}">
+      FocusManager.FocusedElement="{Binding ElementName=UsernameBox}"
+      SnapsToDevicePixels="True"
+      RenderOptions.BitmapScalingMode="HighQuality"
+      RenderOptions.ClearTypeHint="Enabled">
+
+    <Page.InputBindings>
+        <KeyBinding Gesture="CTRL+OemPlus" Command="{Binding ShowAddTagPanelCommand}"/>
+        <KeyBinding Gesture="CTRL+C" Command="{Binding CopySelectedCommand}"/>
+    </Page.InputBindings>
 
     <Page.Resources>
 
-        <!-- BUTTONS -->
-        <Style x:Key="RedButton" TargetType="Button">
-            <Setter Property="Background" Value="#ff6666"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="{StaticResource RoundedCornerValue}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#e94545"/>
-                </Trigger>
-            </Style.Triggers>
-
-        </Style>
-
-        <Style x:Key="BlueButton" TargetType="Button" BasedOn="{StaticResource RedButton}">
-            <Setter Property="Background" Value="#6FADD1"/>
-
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#4A7F9E"/>
-                </Trigger>
-            </Style.Triggers>
-
-        </Style>
+        <sys:Double x:Key="ListButtonsSize">18</sys:Double>
 
         <Style x:Key="AddItemButton" TargetType="Button" BasedOn="{StaticResource BlueButton}">
             <Setter Property="Visibility" Value="Hidden"/>
@@ -134,17 +112,10 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-
-
+        
+        
+        
         <!-- TEXT -->
-        <Style x:Key="RoundTextBox" TargetType="TextBox">
-            <Style.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="{StaticResource RoundedCornerValue}"/>
-                </Style>
-            </Style.Resources>
-        </Style>
-
         <Style x:Key="TagTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Gray"/>
             <Style.Triggers>
@@ -264,6 +235,7 @@
 
             </Grid>
 
+            <!-- Username and Get Tags button -->
             <Grid Margin="0 6 0 0">
 
                 <Grid.ColumnDefinitions>
@@ -272,6 +244,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBox x:Name="UsernameBox"
+                         Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Foreground="Gray"
                          Margin="0 0 6 0"
                          VerticalContentAlignment="Center"
@@ -281,8 +254,7 @@
                          Style="{StaticResource RoundTextBox}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Return"
-                                    Command="{Binding GetTagsCommand}"
-                                    CommandParameter="{Binding ElementName=UsernameBox, Path=Text}"/>
+                                    Command="{Binding GetTagsCommand}"/>
                     </TextBox.InputBindings>
                 </TextBox>
 
@@ -300,8 +272,7 @@
                         Height="26"
                         Content="Get Tags"
                         Style="{StaticResource RedButton}"
-                        Command="{Binding GetTagsCommand}"
-                        CommandParameter="{Binding ElementName=UsernameBox, Path=Text}"/>
+                        Command="{Binding GetTagsCommand}"/>
             </Grid>
 
         </StackPanel>
@@ -313,7 +284,6 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <Grid x:Name="ListsPanel">
@@ -353,13 +323,14 @@
                                     <TextBlock Text="{Binding Count}"
                                                HorizontalAlignment="Right"
                                                Grid.Column="1"
-                                               Style="{StaticResource TagTextStyle}"/>                                    
+                                               Style="{StaticResource TagCountStyle}"/>                                    
 
                                     <Button Content=">"
                                             Grid.Column="1"
+                                            Margin="0 0 -2 0"
                                             FontSize="12"
-                                            Width="14"
-                                            Height="14"
+                                            Width="{StaticResource ListButtonsSize}"
+                                            Height="{StaticResource ListButtonsSize}"
                                             HorizontalAlignment="Right"                                            
                                             Style="{StaticResource AddItemButton}"
                                             Command="{Binding RelativeSource={RelativeSource FindAncestor, 
@@ -401,7 +372,7 @@
 
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="auto"/>
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Text="{Binding Name}"
@@ -409,15 +380,16 @@
                                                Foreground="Gray"/>
 
                                         <Button Content="X"
-                                            FontSize="10"
-                                            Grid.Column="1"
-                                            Height="14"
-                                            Width="14"
-                                            HorizontalAlignment="Right"
-                                            Style="{StaticResource RemoveItemButton}"
-                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, 
-                                                AncestorType={x:Type ListBox}}, Path=DataContext.RemoveItemFromSelectedCommand}"
-                                            CommandParameter="{Binding}"/>
+                                                FontSize="10"
+                                                Grid.Column="1"
+                                                Margin="0 0 -2 0"
+                                                Width="{StaticResource ListButtonsSize}"
+                                                Height="{StaticResource ListButtonsSize}"
+                                                HorizontalAlignment="Right"
+                                                Style="{StaticResource RemoveItemButton}"
+                                                Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                    AncestorType={x:Type ListBox}}, Path=DataContext.RemoveItemFromSelectedCommand}"
+                                                CommandParameter="{Binding}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -452,12 +424,12 @@
                                     Grid.Column="2"
                                     FontSize="16"
                                     Style="{StaticResource BlueButton}"
-                                    Click="AddTagPlusButton_Click">+</Button>
+                                    Command="{Binding ShowAddTagPanelCommand}">+</Button>
 
                         </Grid>
 
 
-                        <Grid Name="AddTagByNamePanel"
+                        <!--<Grid Name="AddTagByNamePanel"
                               Grid.Row="1"
                               VerticalAlignment="Top"
                               Visibility="Collapsed"
@@ -482,7 +454,18 @@
                                      Grid.Column="1"
                                      Height="18.5"
                                      Background="White"
-                                     Style="{StaticResource RoundTextBox}"/>
+                                     Style="{StaticResource RoundTextBox}"
+                                     Validation.ErrorTemplate="{StaticResource ErrorTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="CustomHashtag" 
+                                             ValidatesOnDataErrors="True"
+                                             UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <app:NoSpacesRule/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
 
                             <Button Content="Add"
                                     Grid.Column="2"
@@ -496,7 +479,7 @@
                                     CommandParameter="{Binding ElementName=AddTagTextBox, Path=Text}"
                                     Click="ClearAndHideAddingTagByName"/>
 
-                        </Grid>
+                        </Grid>-->
 
 
 
@@ -509,6 +492,20 @@
 
 
 
+            <Grid Margin="40"
+                  VerticalAlignment="Bottom"
+                  MaxWidth="400">
+
+                <UserControl Name="AddCustomTagControl"
+                             Grid.Row="1"
+                             FontFamily="{StaticResource MontserratRegular}"
+                             Visibility="{Binding ShowingCustomTagPanel, 
+                                Converter={StaticResource BoolToVisibilityConverter}}">
+                    <controls:AddCustomHashtag/>
+                </UserControl>
+
+            </Grid>
+            
 
             <!--<Grid x:Name="MiddleButtonsPanel"
                   Grid.Row="1"

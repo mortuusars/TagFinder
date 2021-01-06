@@ -5,7 +5,7 @@
              xmlns:conv="clr-namespace:TagFinder.ViewModels.Converters"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              Startup="Application_Startup">
-    <Application.Resources>
+    <Application.Resources>        
         <ResourceDictionary>
 
             <ResourceDictionary.MergedDictionaries>
@@ -18,7 +18,75 @@
             <conv:CountForegroundConverter x:Key="CountForegroundConverter"/>
 
             <CornerRadius x:Key="RoundedCornerValue">2</CornerRadius>
-            
-        </ResourceDictionary>
+
+            <ControlTemplate x:Key="ErrorTemplate">
+                <Border BorderBrush="#ff6666" BorderThickness="2" CornerRadius="{StaticResource RoundedCornerValue}">
+                    <Grid>
+                        <AdornedElementPlaceholder/>
+                        <TextBlock Text="{Binding [0].ErrorContent}"
+                               Foreground="#ff6666"
+                               VerticalAlignment="Center" HorizontalAlignment="Right"
+                               Margin="0 0 2 0"/>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+
+
+            <!-- BUTTONS -->
+            <Style x:Key="RedButton" TargetType="Button">
+                <Setter Property="Background" Value="#ff6666"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}"
+                                CornerRadius="{StaticResource RoundedCornerValue}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#e94545"/>
+                    </Trigger>
+                    
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="#f99595"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Trigger>
+                </Style.Triggers>
+
+            </Style>
+
+            <Style x:Key="BlueButton" TargetType="Button" BasedOn="{StaticResource RedButton}">
+                <Setter Property="Background" Value="#59a9d7"/>
+
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#4A7F9E"/>
+                    </Trigger>
+                    
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="#9dc0d6"/>
+                        <Setter Property="Foreground" Value="#eaeaea"/>
+                    </Trigger>
+                </Style.Triggers>
+
+            </Style>
+
+
+            <!-- TEXT -->
+            <Style x:Key="RoundTextBox" TargetType="TextBox">
+                <Style.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="{StaticResource RoundedCornerValue}"/>
+                    </Style>
+                </Style.Resources>
+            </Style>
+
+        </ResourceDictionary>        
     </Application.Resources>
 </Application>
