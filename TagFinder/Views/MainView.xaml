@@ -8,7 +8,7 @@
         xmlns:wpfanimated="http://wpfanimatedgif.codeplex.com"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Tag Finder"
+        Title="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         MinWidth="280"
         MinHeight="350"
         Width="400"
