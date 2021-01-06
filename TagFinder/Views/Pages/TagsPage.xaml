@@ -18,6 +18,11 @@
       RenderOptions.BitmapScalingMode="HighQuality"
       RenderOptions.ClearTypeHint="Enabled">
 
+    <Page.InputBindings>
+        <KeyBinding Gesture="CTRL+OemPlus" Command="{Binding ShowAddTagPanelCommand}"/>
+        <KeyBinding Gesture="CTRL+C" Command="{Binding CopySelectedCommand}"/>
+    </Page.InputBindings>
+
     <Page.Resources>
 
         <sys:Double x:Key="ListButtonsSize">18</sys:Double>
