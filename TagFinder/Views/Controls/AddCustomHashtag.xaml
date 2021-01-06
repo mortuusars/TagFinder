@@ -38,7 +38,8 @@
                      Background="White"
                      Foreground="SlateGray"
                      Style="{StaticResource RoundTextBox}"
-                     Validation.ErrorTemplate="{StaticResource ErrorTemplate}">                
+                     Validation.ErrorTemplate="{StaticResource ErrorTemplate}"
+                     app:FocusExtension.IsFocused="{Binding IsCustomTagBoxFocused}">
                 <TextBox.Text>
                     <Binding Path="CustomTag" 
                              ValidatesOnDataErrors="True"
@@ -51,6 +52,7 @@
 
                 <TextBox.InputBindings>
                     <KeyBinding Key="Return" Command="{Binding AddCustomTagCommand}"/>
+                    <KeyBinding Key="Esc" Command="{Binding CloseAddingCustomTagCommand}"/>
                 </TextBox.InputBindings>
             </TextBox>
             

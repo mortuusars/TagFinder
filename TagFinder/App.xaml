@@ -54,7 +54,7 @@
                     </Trigger>
                     
                     <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Background" Value="#db8989"/>
+                        <Setter Property="Background" Value="#f99595"/>
                         <Setter Property="Foreground" Value="White"/>
                     </Trigger>
                 </Style.Triggers>
@@ -62,7 +62,7 @@
             </Style>
 
             <Style x:Key="BlueButton" TargetType="Button" BasedOn="{StaticResource RedButton}">
-                <Setter Property="Background" Value="#6FADD1"/>
+                <Setter Property="Background" Value="#59a9d7"/>
 
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
@@ -70,7 +70,7 @@
                     </Trigger>
                     
                     <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Background" Value="#a3bac8"/>
+                        <Setter Property="Background" Value="#9dc0d6"/>
                         <Setter Property="Foreground" Value="#eaeaea"/>
                     </Trigger>
                 </Style.Triggers>

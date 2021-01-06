@@ -26,6 +26,8 @@ namespace TagFinder.ViewModels
         public int TagLimit { get; set; } = 20;
         public bool IncludeGlobalCount { get; set; } = false;
 
+        public string Username { get; set; }
+
         public string Status { get; set; } = StatusManager.Status;
         public int SelectedCount { get; set; }
 
@@ -35,6 +37,7 @@ namespace TagFinder.ViewModels
 
         public bool ShowingCustomTagPanel { get; set; }
         public string CustomTag { get; set; }
+        public bool IsCustomTagBoxFocused { get; set; }
 
         public ICommand GetTagsCommand { get; }
         public ICommand ClearSelectedCommand { get; }
@@ -65,18 +68,20 @@ namespace TagFinder.ViewModels
 
             #region Commands
 
-            GetTagsCommand = new RelayCommand(username => OnGetTagsCommand((string)username));
+            GetTagsCommand = new RelayCommand(_ => OnGetTagsCommand((string)Username), canEx => !string.IsNullOrWhiteSpace(Username));
 
-            ClearSelectedCommand = new RelayCommand(_ => RemoveListFromSelectedItems(SelectedTagsList));
             RemoveItemFromSelectedCommand = new RelayCommand(item => RemoveItemFromSelected((TagRecord)item));
             RemoveListFromSelectedCommand = new RelayCommand(items => RemoveListFromSelectedItems((System.Collections.IList)items));
             AddItemToSelectedCommand = new RelayCommand(item => AddItemToSelected((TagRecord)item));
             AddListToSelectedCommand = new RelayCommand(items => AddListToSelected((System.Collections.IList)items));
-            CopySelectedCommand = new RelayCommand(_ => CopyToClipboard());
 
-            ShowAddTagPanelCommand = new RelayCommand(_ => ShowingCustomTagPanel = !ShowingCustomTagPanel);
-            AddCustomTagCommand = new RelayCommand(_ => AddCustomTag(CustomTag), canEx => CanAddCustomTag(CustomTag));
-            CloseAddingCustomTagCommand = new RelayCommand(_ => { ShowingCustomTagPanel = false; CustomTag = string.Empty; });
+            ClearSelectedCommand = new RelayCommand(_ => RemoveListFromSelectedItems(SelectedTagsList), canEx => SelectedCount > 0);
+            CopySelectedCommand = new RelayCommand(_ => CopyToClipboard(), canEx => SelectedCount > 0);
+
+            ShowAddTagPanelCommand = new RelayCommand(_ => ShowAddTagPanel());
+
+            AddCustomTagCommand = new RelayCommand(_ => { AddCustomTag(CustomTag); CustomTag = string.Empty; }, canEx => CanAddCustomTag(CustomTag));
+            CloseAddingCustomTagCommand = new RelayCommand(_ => { ShowingCustomTagPanel = false; CustomTag = string.Empty; IsCustomTagBoxFocused = false; });
 
             SettingsCommand = new RelayCommand(_ => ViewManager.ShowSettingsView());
             LogOutCommand = new RelayCommand(_ => OnLogOutCommand());
@@ -93,7 +98,13 @@ namespace TagFinder.ViewModels
             IsUserInfoAvailable = true;
 
             ReadPreferences();
+
+#if DEBUG
+            Username = "mortuus_cg";
+#endif
         }
+
+        
 
         private void OnSelectedChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -199,7 +210,7 @@ namespace TagFinder.ViewModels
             }
 
             // Check if manually added tag exists in main list.
-            var existingInAll = TagsList.FirstOrDefault(i => i.Name == name);
+            var existingInAll = TagsList.Find(i => i.Name == name);
             if (existingInAll != null)
             {
                 SelectedTagsList.Add(existingInAll);
@@ -208,6 +219,13 @@ namespace TagFinder.ViewModels
             }
 
             SelectedTagsList.Add(new TagRecord() { Name = name });
+        }
+
+        private void ShowAddTagPanel()
+        {
+            IsCustomTagBoxFocused = false;
+            ShowingCustomTagPanel = !ShowingCustomTagPanel;
+            IsCustomTagBoxFocused = true;
         }
 
         private bool CanAddCustomTag(string customTag) => !string.IsNullOrWhiteSpace(customTag);

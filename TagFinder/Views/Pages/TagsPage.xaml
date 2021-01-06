@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:TagFinder.Views.Pages"
       xmlns:controls="clr-namespace:TagFinder.Views.Controls"
       xmlns:app="clr-namespace:TagFinder"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="360"
       Title="TagsPage"
@@ -18,6 +19,8 @@
       RenderOptions.ClearTypeHint="Enabled">
 
     <Page.Resources>
+
+        <sys:Double x:Key="ListButtonsSize">18</sys:Double>
 
         <Style x:Key="AddItemButton" TargetType="Button" BasedOn="{StaticResource BlueButton}">
             <Setter Property="Visibility" Value="Hidden"/>
@@ -236,6 +239,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBox x:Name="UsernameBox"
+                         Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Foreground="Gray"
                          Margin="0 0 6 0"
                          VerticalContentAlignment="Center"
@@ -245,8 +249,7 @@
                          Style="{StaticResource RoundTextBox}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Return"
-                                    Command="{Binding GetTagsCommand}"
-                                    CommandParameter="{Binding ElementName=UsernameBox, Path=Text}"/>
+                                    Command="{Binding GetTagsCommand}"/>
                     </TextBox.InputBindings>
                 </TextBox>
 
@@ -264,8 +267,7 @@
                         Height="26"
                         Content="Get Tags"
                         Style="{StaticResource RedButton}"
-                        Command="{Binding GetTagsCommand}"
-                        CommandParameter="{Binding ElementName=UsernameBox, Path=Text}"/>
+                        Command="{Binding GetTagsCommand}"/>
             </Grid>
 
         </StackPanel>
@@ -316,13 +318,14 @@
                                     <TextBlock Text="{Binding Count}"
                                                HorizontalAlignment="Right"
                                                Grid.Column="1"
-                                               Style="{StaticResource TagTextStyle}"/>                                    
+                                               Style="{StaticResource TagCountStyle}"/>                                    
 
                                     <Button Content=">"
                                             Grid.Column="1"
+                                            Margin="0 0 -2 0"
                                             FontSize="12"
-                                            Width="14"
-                                            Height="14"
+                                            Width="{StaticResource ListButtonsSize}"
+                                            Height="{StaticResource ListButtonsSize}"
                                             HorizontalAlignment="Right"                                            
                                             Style="{StaticResource AddItemButton}"
                                             Command="{Binding RelativeSource={RelativeSource FindAncestor, 
@@ -364,7 +367,7 @@
 
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="auto"/>
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Text="{Binding Name}"
@@ -372,15 +375,16 @@
                                                Foreground="Gray"/>
 
                                         <Button Content="X"
-                                            FontSize="10"
-                                            Grid.Column="1"
-                                            Height="14"
-                                            Width="14"
-                                            HorizontalAlignment="Right"
-                                            Style="{StaticResource RemoveItemButton}"
-                                            Command="{Binding RelativeSource={RelativeSource FindAncestor, 
-                                                AncestorType={x:Type ListBox}}, Path=DataContext.RemoveItemFromSelectedCommand}"
-                                            CommandParameter="{Binding}"/>
+                                                FontSize="10"
+                                                Grid.Column="1"
+                                                Margin="0 0 -2 0"
+                                                Width="{StaticResource ListButtonsSize}"
+                                                Height="{StaticResource ListButtonsSize}"
+                                                HorizontalAlignment="Right"
+                                                Style="{StaticResource RemoveItemButton}"
+                                                Command="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                    AncestorType={x:Type ListBox}}, Path=DataContext.RemoveItemFromSelectedCommand}"
+                                                CommandParameter="{Binding}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
