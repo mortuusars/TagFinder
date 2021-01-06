@@ -13,7 +13,8 @@
         MinHeight="350"
         Width="400"
         Height="600" 
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        FontFamily="{StaticResource MontserratRegular}">
 
     <Window.Resources>
 

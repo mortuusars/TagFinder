@@ -11,7 +11,7 @@
       d:DesignHeight="450" d:DesignWidth="360"
       Title="TagsPage"
       d:Background="White"
-      FontFamily="{StaticResource MontserratLight}"
+      FontFamily="{StaticResource MontserratRegular}"
       FontSize="14"
       FocusManager.FocusedElement="{Binding ElementName=UsernameBox}"
       SnapsToDevicePixels="True"
@@ -250,7 +250,7 @@
                          VerticalContentAlignment="Center"
                          Padding="4 0 0 0"
                          BorderBrush="Gray"
-                         FontSize="17"
+                         FontSize="16"
                          Style="{StaticResource RoundTextBox}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Return"
