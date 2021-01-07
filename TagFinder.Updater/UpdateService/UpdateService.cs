@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace TagFinder.Updater
@@ -20,7 +21,7 @@ namespace TagFinder.Updater
             string[] filesToDelete = await GetFilesToDeleteAsync();
 
             UpdateProcess?.Invoke(this, "Getting info from server");
-            ZipFileName = $"TagFinder-{await GetVersionAsync()}.zip";
+            ZipFileName = $"TagFinder-{await GetVersionStringAsync()}.zip";
 
             UpdateProcess?.Invoke(this, $"Downloading {ZipFileName}");
             var (isSuccessful, errorReason) = await DownloadNewFileAsync(ZipFileName);
@@ -70,12 +71,15 @@ namespace TagFinder.Updater
             Debug.WriteLine("All Files Deleted");
         }
 
-        private async Task<string> GetVersionAsync()
+        private async Task<string> GetVersionStringAsync()
         {
             Debug.WriteLine("Getting version from server...");
-            var request = await new HttpClient().GetAsync("http://mortuusars.000webhostapp.com/currentVersion.txt");
+            var request = await new HttpClient().GetAsync(File.ReadAllText("updateUrl.txt"));
 
-            var version = await request.Content.ReadAsStringAsync();
+            var jsonstring = await request.Content.ReadAsStringAsync();
+            VersionInfo versionInfo = JsonSerializer.Deserialize<VersionInfo>(jsonstring);
+            string version = versionInfo.Version;
+
             Debug.WriteLine("Current version: " + version);
 
             return version;
@@ -84,7 +88,7 @@ namespace TagFinder.Updater
         private async Task<(bool isSuccessful, string errorReason)> DownloadNewFileAsync(string fileName)
         {
             Debug.WriteLine("Getting file from server...");
-            var req = await new HttpClient().GetAsync($"http://mortuusars.000webhostapp.com/{fileName}");
+            var req = await new HttpClient().GetAsync(File.ReadAllText("downloadUrl.txt" + fileName));
 
             if (req.IsSuccessStatusCode)
             {

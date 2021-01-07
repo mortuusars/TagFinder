@@ -23,6 +23,8 @@ namespace TagFinder
         public static readonly string LOG_FILE = APPLOCAL_FOLDER + "log.txt";
 
         public const string CHANGELOG_FILE = "changelog.md";
+        public const string LATEST_CHANGELOG_FILE = "latestChangelog.md";
         public const string UPDATE_URL_FILE = "updateUrl.txt";
+        public const string MANUAL_UPDATE_URL_FILE = "manualUpdateUrl.txt";
     }
 }

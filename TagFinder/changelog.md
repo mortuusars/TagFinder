@@ -1,3 +1,13 @@
+# 0.2.0 - 2021-01-07
+
+Updater Time!
+- Tag Finder now can update itself
+
+- Changed some fonts
+- Fixed blurry Add Tag panel
+- Moved settings file to Appdata/Local
+- Many other fixes and improvements
+
 # 0.1.4 - 2021-01-06
 
 - Buttons now will be greyed out when they cannot be pressed

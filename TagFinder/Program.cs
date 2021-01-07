@@ -6,13 +6,15 @@ using TagFinder.Infrastructure;
 using TagFinder.Core.InstagramAPI;
 using TagFinder.Core.Logger;
 using TagFinder.Views.Pages;
+using System.Text.Json;
+using TagFinder.VersionManager;
 
 namespace TagFinder
 {
     public class Program
     {
         public const string APP_NAME = "TagFinder";
-        public static readonly Version APP_VERSION = new Version("0.1.4");
+        public static readonly Version APP_VERSION = new Version("0.2.0");
 
         //public static ViewManager ViewManager { get; private set; }
         public static PageManager PageManager { get; private set; }
@@ -39,6 +41,22 @@ namespace TagFinder
             ViewManager.ShowMainView();
 
             SetStartingPage();
+
+#if DEBUG
+            GenerateVersionJson();
+#endif
+        }
+
+        private static void GenerateVersionJson()
+        {
+            var info = new VersionInfo()
+            {
+                Version = APP_VERSION.ToString(),
+                Changelog = File.ReadAllText(FilePath.LATEST_CHANGELOG_FILE)
+            };
+
+            string jsonString = JsonSerializer.Serialize(info, new JsonSerializerOptions() { WriteIndented = true });
+            File.WriteAllText("latestVersion.json", jsonString);
         }
 
         private async void SetStartingPage()
@@ -73,33 +91,58 @@ namespace TagFinder
 
         private async void CheckUpdates()
         {
-            VersionManager versionManager = new VersionManager(Logger);
+            IVersionManager versionManager = new JsonVersionManager(Logger);
 
-            var (isUpdateAvailable, newVersion) = await versionManager.CheckNewVersion(APP_VERSION, FilePath.UPDATE_URL_FILE);
+            var (isUpdateAvailable, versionInfo) = await versionManager.CheckNewVersionAsync(APP_VERSION, File.ReadAllText(FilePath.UPDATE_URL_FILE));
 
-            if (isUpdateAvailable)
+            if (!isUpdateAvailable)
+                return;
+
+            if (AskUserForUpdate(versionInfo))
             {
-                ShowCanUpdateMessage(newVersion);
+                //if (versionInfo.ShouldUpdateManually)
+                //    StartUpdateProcess(FilePath.MANUAL_UPDATE_URL_FILE);
+                //else
+                //    StartUpdateProcess("TagFinder.Updater.exe");
+
+                //App.Current.Shutdown();
             }
         }
 
-        private static void ShowCanUpdateMessage(Version newVersion)
+        private void StartUpdateProcess(string name)
         {
-            string message = "New update available. Open download page?\n" +
-                                $"Current version: {APP_VERSION}\nAvailable version: {newVersion}";
+            ProcessStartInfo processStartInfo = new ProcessStartInfo(name)
+            {
+                UseShellExecute = true,
+                Verb = "open"
+            };
+            Process.Start(processStartInfo);
+        }
+
+        private static bool AskUserForUpdate(VersionInfo newVersionInfo)
+        {
+            string changelog = newVersionInfo.Changelog;
+
+            if (changelog.Length > 300)
+                changelog = changelog.Substring(0, 300) + "...\nAnd many more changes!";
+
+            string updateAction = "";
+
+            if (newVersionInfo.ShouldUpdateManually)
+                updateAction = "Manual update needed. Open download page?";
+            else
+                updateAction = "Update automatically?";
+
+            string message = $"New update available. {updateAction}\n\n" +
+                             $"Current version: {APP_VERSION}\n" +
+                             $"New version: {newVersionInfo.Version}" +
+                             $"\n\nChanges:\n\n{changelog}";
 
             if (MessageBox.Show(message, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Information,
                 MessageBoxResult.Yes) == MessageBoxResult.Yes)
-            {
-                string url = File.ReadAllText(FilePath.UPDATE_URL_FILE);
+                return true;
 
-                var ps = new ProcessStartInfo(url)
-                {
-                    UseShellExecute = true,
-                    Verb = "open"
-                };
-                Process.Start(ps);
-            }
+            return false;
         }
 
         #endregion
