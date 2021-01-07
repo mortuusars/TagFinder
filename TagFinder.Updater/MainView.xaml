@@ -1,0 +1,108 @@
+﻿<Window x:Class="TagFinder.Updater.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TagFinder.Updater"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="auto" Width="350"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="Transparent"
+        AllowsTransparency="True">
+
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <LinearGradientBrush x:Key="MainGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#fefefe" Offset="0"/>
+            <GradientStop Color="#efefef" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="Loading" TargetType="Image">
+            <Setter Property="Visibility" Value="Collapsed"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding InProgress}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="{StaticResource MainGradient}"
+                Grid.RowSpan="2"
+                CornerRadius="6">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="2" Direction="-90" Opacity="0.5"/>
+            </Border.Effect>
+        </Border>
+
+        <Image Margin="20"
+               Source="Resources/Images/logo.png"
+               MouseDown="Logo_MouseDown"/>
+
+        <Grid x:Name="UpdateInfoPanel"
+              Grid.Row="1"
+              Margin="0 0 0 20"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Grid.Column="0"
+                   Margin="6"
+                   Width="18" Height="18" 
+                   Opacity="0.7"
+                   Source="Resources/Images/loading.png"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   d:Visibility="Visible"
+                   Style="{StaticResource Loading}"
+                   RenderTransformOrigin="0.5, 0.5">
+                <Image.OpacityMask>
+                    <SolidColorBrush Color="Gray"/>
+                </Image.OpacityMask>
+
+                <Image.RenderTransform>
+                    <RotateTransform x:Name="Spinning" Angle="90"/>
+                </Image.RenderTransform>
+
+                <Image.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="(RotateTransform.Angle)"
+                                                 Storyboard.TargetName="Spinning"
+                                                 From="90" To="450"
+                                                 Duration="0:0:0.6"
+                                                 RepeatBehavior="Forever">
+                                </DoubleAnimation>
+
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Image.Triggers>
+
+            </Image>
+
+            <TextBlock Text="{Binding UpdateProcess}"
+                       d:Text="Updating..."
+                       Grid.Column="1"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="Gray"
+                       FontSize="16"/>
+        </Grid>
+    </Grid>
+</Window>

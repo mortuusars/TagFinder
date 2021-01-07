@@ -78,7 +78,9 @@ namespace TagFinder
             var (isUpdateAvailable, newVersion) = await versionManager.CheckNewVersion(APP_VERSION, FilePath.UPDATE_URL_FILE);
 
             if (isUpdateAvailable)
+            {
                 ShowCanUpdateMessage(newVersion);
+            }
         }
 
         private static void ShowCanUpdateMessage(Version newVersion)
