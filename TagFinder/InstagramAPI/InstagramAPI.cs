@@ -13,7 +13,7 @@ using TagFinder.Logger;
 
 namespace TagFinder.InstagramAPI
 {
-    public class StandardInstagramAPI : IInstagramAPI
+    public class InstagramAPI : IInstagramAPI
     {
         public string CurrentUserName { get; private set; }
         public BitmapImage UserProfilePic { get; private set; }
@@ -23,7 +23,7 @@ namespace TagFinder.InstagramAPI
         private readonly string _userStateFilePath;
         private readonly ILogger _logger;
 
-        public StandardInstagramAPI(string userStateFilePath, ILogger logger)
+        public InstagramAPI(string userStateFilePath, ILogger logger)
         {
             _userStateFilePath = userStateFilePath;
             _logger = logger;

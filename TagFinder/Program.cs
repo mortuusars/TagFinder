@@ -31,7 +31,7 @@ namespace TagFinder
             if (Settings.CheckForUpdates)
                 CheckUpdates();
 
-            InstagramAPIService = new StandardInstagramAPI(FileNames.STATE_FILEPATH, Logger);
+            InstagramAPIService = new InstagramAPI.InstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
             PageManager = new PageManager();
 
