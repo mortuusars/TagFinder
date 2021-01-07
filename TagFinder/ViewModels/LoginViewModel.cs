@@ -1,17 +1,16 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using PropertyChanged;
 using TagFinder.Core.InstagramAPI;
 using TagFinder.Core.Logger;
 
 namespace TagFinder.ViewModels
 {
-    public class LoginViewModel : INotifyPropertyChanged
+    [AddINotifyPropertyChangedInterface]
+    public class LoginViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public string Username { get; set; }
 
         public bool IsCodeRequired { get; set; }
@@ -42,9 +41,9 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                if (File.Exists(FileNames.LAST_USER_FILEPATH))
+                if (File.Exists(FilePath.LAST_USER_FILEPATH))
                 {
-                    return File.ReadAllText(FileNames.LAST_USER_FILEPATH);
+                    return File.ReadAllText(FilePath.LAST_USER_FILEPATH);
                 }
             }
             catch (Exception)
@@ -59,7 +58,7 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                File.WriteAllTextAsync(FileNames.LAST_USER_FILEPATH, username);
+                File.WriteAllTextAsync(FilePath.LAST_USER_FILEPATH, username);
             }
             catch (Exception)
             {

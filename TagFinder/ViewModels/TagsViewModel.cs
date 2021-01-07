@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using PropertyChanged;
 using TagFinder.Core.InstagramAPI;
 using TagFinder.Core.Logger;
 
 namespace TagFinder.ViewModels
 {
-    public class TagsViewModel : INotifyPropertyChanged
+    [AddINotifyPropertyChangedInterface]
+    [SuppressPropertyChangedWarnings]
+    public class TagsViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         #region Properties
 
         public List<TagRecord> TagsList { get; set; }
@@ -26,7 +25,7 @@ namespace TagFinder.ViewModels
 
         public int PagesToLoad { get; set; } = 5;
         public int TagLimit { get; set; } = 20;
-        public bool IncludeGlobalCount { get; set; } = false;
+        public bool IncludeGlobalCount { get; set; }
 
         public string GetTagsUsername { get; set; }
 
@@ -276,8 +275,8 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                PagesToLoad = Convert.ToInt32(File.ReadAllText(FileNames.PAGES_TO_LOAD_FILEPATH));
-                TagLimit = Convert.ToInt32(File.ReadAllText(FileNames.TAG_LIMIT_FILEPATH));
+                PagesToLoad = Convert.ToInt32(File.ReadAllText(FilePath.PAGES_TO_LOAD_FILEPATH));
+                TagLimit = Convert.ToInt32(File.ReadAllText(FilePath.TAG_LIMIT_FILEPATH));
 
             }
             catch (Exception)
@@ -291,8 +290,8 @@ namespace TagFinder.ViewModels
         {
             try
             {
-                File.WriteAllTextAsync(FileNames.PAGES_TO_LOAD_FILEPATH, PagesToLoad.ToString());
-                File.WriteAllTextAsync(FileNames.TAG_LIMIT_FILEPATH, TagLimit.ToString());
+                File.WriteAllTextAsync(FilePath.PAGES_TO_LOAD_FILEPATH, PagesToLoad.ToString());
+                File.WriteAllTextAsync(FilePath.TAG_LIMIT_FILEPATH, TagLimit.ToString());
             }
             catch (Exception)
             {

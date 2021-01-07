@@ -2,7 +2,7 @@
 
 namespace TagFinder
 {
-    public static class FileNames
+    public static class FilePath
     {
         /// <summary>
         /// Path to application folder. Ends with /.

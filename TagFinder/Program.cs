@@ -25,13 +25,13 @@ namespace TagFinder
         {
             CreateAppFolders();
 
-            Logger = new FileLogger(FileNames.LOG_FILE);
+            Logger = new FileLogger(FilePath.LOG_FILE);
             Settings = Settings.Load();
 
             if (Settings.CheckForUpdates)
                 CheckUpdates();
 
-            InstagramAPIService = new InstagramAPI(FileNames.STATE_FILEPATH, Logger);
+            InstagramAPIService = new InstagramAPI(FilePath.STATE_FILEPATH, Logger);
 
             PageManager = new PageManager();
 
@@ -43,14 +43,14 @@ namespace TagFinder
 
         private async void SetStartingPage()
         {
-            if (!File.Exists(FileNames.LAST_USER_FILEPATH))
+            if (!File.Exists(FilePath.LAST_USER_FILEPATH))
             {
                 Logger.Log("No last user file");
                 PageManager.SetPage(Pages.LoginPage);
                 return;
             }
 
-            var result = await InstagramAPIService.LogInAsync(File.ReadAllText(FileNames.LAST_USER_FILEPATH));
+            var result = await InstagramAPIService.LogInAsync(File.ReadAllText(FilePath.LAST_USER_FILEPATH));
 
             if (result == LoginResult.Success)
             {
@@ -75,7 +75,7 @@ namespace TagFinder
         {
             VersionManager versionManager = new VersionManager(Logger);
 
-            var (isUpdateAvailable, newVersion) = await versionManager.CheckNewVersion(APP_VERSION, FileNames.UPDATE_URL_FILE);
+            var (isUpdateAvailable, newVersion) = await versionManager.CheckNewVersion(APP_VERSION, FilePath.UPDATE_URL_FILE);
 
             if (isUpdateAvailable)
                 ShowCanUpdateMessage(newVersion);
@@ -89,7 +89,7 @@ namespace TagFinder
             if (MessageBox.Show(message, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Information,
                 MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
-                string url = File.ReadAllText(FileNames.UPDATE_URL_FILE);
+                string url = File.ReadAllText(FilePath.UPDATE_URL_FILE);
 
                 var ps = new ProcessStartInfo(url)
                 {
@@ -104,8 +104,8 @@ namespace TagFinder
 
         private void CreateAppFolders()
         {
-            Directory.CreateDirectory(FileNames.CACHE);
-            Directory.CreateDirectory(FileNames.APPLOCAL_FOLDER);
+            Directory.CreateDirectory(FilePath.CACHE);
+            Directory.CreateDirectory(FilePath.APPLOCAL_FOLDER);
         }
     }
 }
