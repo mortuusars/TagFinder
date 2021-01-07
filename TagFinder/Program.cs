@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using TagFinder.Infrastructure;
-using TagFinder.InstagramAPI;
-using TagFinder.Logger;
+using TagFinder.Core.InstagramAPI;
+using TagFinder.Core.Logger;
 using TagFinder.Views.Pages;
 
 namespace TagFinder
@@ -14,7 +14,7 @@ namespace TagFinder
         public const string APP_NAME = "TagFinder";
         public static readonly Version APP_VERSION = new Version("0.1.4");
 
-        public static ViewManager ViewManager { get; private set; }
+        //public static ViewManager ViewManager { get; private set; }
         public static PageManager PageManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
 
@@ -31,11 +31,11 @@ namespace TagFinder
             if (Settings.CheckForUpdates)
                 CheckUpdates();
 
-            InstagramAPIService = new InstagramAPI.InstagramAPI(FileNames.STATE_FILEPATH, Logger);
+            InstagramAPIService = new InstagramAPI(FileNames.STATE_FILEPATH, Logger);
 
             PageManager = new PageManager();
 
-            ViewManager = new ViewManager();
+            //ViewManager = new ViewManager();
             ViewManager.ShowMainView();
 
             SetStartingPage();

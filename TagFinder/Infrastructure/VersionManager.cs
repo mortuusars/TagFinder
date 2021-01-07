@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TagFinder.Logger;
+using TagFinder.Core.Logger;
 
 namespace TagFinder.Infrastructure
 {

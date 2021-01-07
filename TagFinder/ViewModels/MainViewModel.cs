@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows.Controls;
 
 namespace TagFinder.ViewModels
 {
@@ -8,11 +9,18 @@ namespace TagFinder.ViewModels
 
         public string Title { get; set; }
 
+        public Page CurrentPage { get; set; }
+
         public bool IsOverlayVisible { get; set; }
         public string Status { get; set; }
 
-        public MainViewModel()
+        private readonly PageManager _pageManager;
+
+        public MainViewModel(PageManager pageManager)
         {
+            _pageManager = pageManager;
+            _pageManager.PageChanged += (_, e) => CurrentPage = _pageManager.CurrentPage;
+
             StatusManager.StatusChanged += (_, e) => Status = StatusManager.Status;
             StatusManager.InProgressChanged += (_, e) => IsOverlayVisible = StatusManager.InProgress;
 

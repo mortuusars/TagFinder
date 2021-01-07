@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using TagFinder.InstagramAPI;
-using TagFinder.Logger;
+using TagFinder.Core.InstagramAPI;
+using TagFinder.Core.Logger;
 
 namespace TagFinder.ViewModels
 {

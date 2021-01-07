@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
-namespace TagFinder.InstagramAPI
+namespace TagFinder.Core.InstagramAPI
 {
     public interface IInstagramAPI
     {
         public string CurrentUserName { get; }
-        public BitmapImage UserProfilePic { get; }
+        //public string UserProfilePicUrl { get; }
 
         public Task<LoginResult> LogInAsync(string userName, string password = null);
         public Task ProvidePhoneNumberAsync(string phoneNumber);
@@ -15,6 +14,6 @@ namespace TagFinder.InstagramAPI
         public Task LogOutAsync();
         public Task<List<TagRecord>> GetTagsFromListAsync(string username, int pagesToLoad, bool includeGlobalCount = false);
         public Task<long> GetGlobalHashtagUsesAsync(string hashtag);
-        public Task<BitmapImage> DownloadUserProfilePicAsync(string userName);
+        public Task<string> DownloadUserProfilePicAsync(string userName);
     }
 }

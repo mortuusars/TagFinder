@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Threading.Tasks;
 
-namespace TagFinder
+namespace TagFinder.Core.InstagramAPI
 {
     public class TagRecord : INotifyPropertyChanged
     {

@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\Images\hashtag_size.ico</ApplicationIcon>
     <Version>0.1.2</Version>
+    <AssemblyName>TagFinder</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,6 +51,14 @@
     <None Update="updateUrl.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TagFinder.Core\TagFinder.Core.csproj" />
   </ItemGroup>
 
 </Project>

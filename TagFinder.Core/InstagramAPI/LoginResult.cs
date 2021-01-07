@@ -1,4 +1,4 @@
-﻿namespace TagFinder
+﻿namespace TagFinder.Core.InstagramAPI
 {
     public enum LoginResult
     {

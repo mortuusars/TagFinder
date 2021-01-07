@@ -8,14 +8,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using TagFinder.InstagramAPI;
-using TagFinder.Logger;
+using TagFinder.Core.InstagramAPI;
+using TagFinder.Core.Logger;
 
 namespace TagFinder.ViewModels
 {
     public class TagsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        #region Properties
 
         public List<TagRecord> TagsList { get; set; }
         public ObservableCollection<TagRecord> SelectedTagsList { get; set; } = new ObservableCollection<TagRecord>();
@@ -26,18 +28,22 @@ namespace TagFinder.ViewModels
         public int TagLimit { get; set; } = 20;
         public bool IncludeGlobalCount { get; set; } = false;
 
-        public string Username { get; set; }
+        public string GetTagsUsername { get; set; }
 
         public string Status { get; set; } = StatusManager.Status;
         public int SelectedCount { get; set; }
 
         public bool IsUserInfoAvailable { get; set; }
         public string LoggedUsername { get; set; }
-        public BitmapImage UserProfilePic { get; set; } = Utility.GetDefaultProfilePic();
+        public BitmapImage UserProfilePic { get; private set; }
 
         public bool ShowingCustomTagPanel { get; set; }
         public string CustomTag { get; set; }
         public bool IsCustomTagBoxFocused { get; set; }
+
+        #endregion
+
+        #region Commands
 
         public ICommand GetTagsCommand { get; }
         public ICommand ClearSelectedCommand { get; }
@@ -54,11 +60,11 @@ namespace TagFinder.ViewModels
         public ICommand SettingsCommand { get; }
         public ICommand LogOutCommand { get; }
 
+        #endregion
+
         private IInstagramAPI _instagramAPI;
         private PageManager _pageManager;
         private ILogger _logger;
-
-
 
         public TagsViewModel(IInstagramAPI instagramAPI, PageManager pageManager, ILogger logger)
         {
@@ -68,7 +74,7 @@ namespace TagFinder.ViewModels
 
             #region Commands
 
-            GetTagsCommand = new RelayCommand(_ => OnGetTagsCommand((string)Username), canEx => !string.IsNullOrWhiteSpace(Username));
+            GetTagsCommand = new RelayCommand(_ => OnGetTagsCommand((string)GetTagsUsername), canEx => !string.IsNullOrWhiteSpace(GetTagsUsername));
 
             RemoveItemFromSelectedCommand = new RelayCommand(item => RemoveItemFromSelected((TagRecord)item));
             RemoveListFromSelectedCommand = new RelayCommand(items => RemoveListFromSelectedItems((System.Collections.IList)items));
@@ -92,23 +98,25 @@ namespace TagFinder.ViewModels
 
             SelectedTagsList.CollectionChanged += OnSelectedChanged;
 
-            if (_instagramAPI.UserProfilePic != null)
-                UserProfilePic = _instagramAPI.UserProfilePic;
-
-            IsUserInfoAvailable = true;
+            GetUserProfilePic();
 
             ReadPreferences();
 
 #if DEBUG
-            Username = "mortuus_cg";
+            GetTagsUsername = "mortuus_cg";
 #endif
         }
-
-        
 
         private void OnSelectedChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             SelectedCount = SelectedTagsList.Count > 0 ? SelectedTagsList.Count : 0;
+        }
+
+        private async void GetUserProfilePic()
+        {
+            string picUrl = await _instagramAPI.DownloadUserProfilePicAsync(_instagramAPI.CurrentUserName);
+            UserProfilePic = Utility.GetUserProfilePicFromUrl(picUrl);
+            IsUserInfoAvailable = true;
         }
 
         private async void OnLogOutCommand()
@@ -193,19 +201,12 @@ namespace TagFinder.ViewModels
 
         private void AddCustomTag(string name)
         {
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                //TODO error to user
-                return;
-            }
-
             name = name.StartsWith('#') ? name : '#' + name;
 
             var existing = SelectedTagsList.FirstOrDefault(i => i.Name == name);
             if (existing != null)
             {
-                // TODO Error to user
+                // TODO Error Tag already added
                 return;
             }
 

@@ -10,7 +10,7 @@ namespace TagFinder
     {
         public event EventHandler<Page> PageChanged;
 
-        public static Page CurrentPage { get; private set; }
+        public Page CurrentPage { get; private set; }
 
         public void SetPage(Pages page)
         {
@@ -19,7 +19,7 @@ namespace TagFinder
             switch (page)
             {
                 case Pages.LoginPage:
-                    newPage = new Login() { DataContext = new LoginViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
+                    newPage = new LoginPage() { DataContext = new LoginViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
                     break;
                 case Pages.TagsPage:
                     newPage = new TagsPage() { DataContext = new TagsViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
