@@ -1,1 +1,1 @@
-﻿https://github.com/mortuusars/TagFinder/releases/latest
+﻿http://mortuusars.000webhostapp.com/TagFinder/latestVersion.json

@@ -27,6 +27,8 @@
 
         <sys:Double x:Key="ListButtonsSize">18</sys:Double>
 
+        <BitmapImage x:Key="DefaultUserProfilePic" UriSource="../Resources/Images/user_48.png"/>
+
         <Style x:Key="AddItemButton" TargetType="Button" BasedOn="{StaticResource BlueButton}">
             <Setter Property="Visibility" Value="Hidden"/>
             <Style.Triggers>
@@ -112,9 +114,9 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
-        
-        
+
+
+
         <!-- TEXT -->
         <Style x:Key="TagTextStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Gray"/>
@@ -244,7 +246,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBox x:Name="UsernameBox"
-                         Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding GetTagsUsername, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Foreground="Gray"
                          Margin="0 0 6 0"
                          VerticalContentAlignment="Center"
@@ -319,7 +321,7 @@
                                     <TextBlock Text="{Binding Count}"
                                                HorizontalAlignment="Right"
                                                Grid.Column="1"
-                                               Style="{StaticResource TagCountStyle}"/>                                    
+                                               Style="{StaticResource TagCountStyle}"/>
 
                                     <Button Content=">"
                                             Grid.Column="1"
@@ -500,7 +502,7 @@
                 </UserControl>
 
             </Grid>
-            
+
 
             <!--<Grid x:Name="MiddleButtonsPanel"
                   Grid.Row="1"
@@ -530,11 +532,13 @@
                         CommandParameter="{Binding ElementName=AllTagsListBox, Path=SelectedItems}"/>
 
 
-                --><!--<Button Content="Info"
+                -->
+            <!--<Button Content="Info"
                         Visibility="Visible"
                         Grid.Column="4"
                         Style="{StaticResource RedButton}"
-                        Click="Button_Click"/>--><!--
+                        Click="Button_Click"/>-->
+            <!--
 
             </Grid>-->
 
@@ -564,8 +568,9 @@
                          RenderOptions.BitmapScalingMode="HighQuality"
                          Style="{StaticResource Ellipse}">
                     <Ellipse.Fill>
-                        <ImageBrush ImageSource="{Binding Path=UserProfilePic}"                                    
-                                    d:ImageSource="../../Resources/Images/user_48.png"/>
+                        <ImageBrush ImageSource="{Binding Path=UserProfilePic, 
+                                    FallbackValue={StaticResource DefaultUserProfilePic}, 
+                                    TargetNullValue={StaticResource DefaultUserProfilePic}}"/>
                     </Ellipse.Fill>
 
                     <Ellipse.ContextMenu>

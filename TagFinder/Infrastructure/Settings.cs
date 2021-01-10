@@ -12,7 +12,7 @@ namespace TagFinder.Infrastructure
 
         public static Settings Load()
         {
-            if (!File.Exists(FileNames.SETTINGS_FILE))
+            if (!File.Exists(FilePath.SETTINGS_FILE))
             {
                 var settings = new Settings();
                 settings.Save();
@@ -21,7 +21,7 @@ namespace TagFinder.Infrastructure
 
             try
             {
-                return JsonSerializer.Deserialize<Settings>(File.ReadAllText(FileNames.SETTINGS_FILE));
+                return JsonSerializer.Deserialize<Settings>(File.ReadAllText(FilePath.SETTINGS_FILE));
             }
             catch (System.Exception)
             {
@@ -36,7 +36,7 @@ namespace TagFinder.Infrastructure
 
             try
             {
-                File.WriteAllText(FileNames.SETTINGS_FILE, jsonString);
+                File.WriteAllText(FilePath.SETTINGS_FILE, jsonString);
             }
             catch (System.Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿namespace TagFinder.Logger
+﻿namespace TagFinder.Core.Logger
 {
     public interface ILogger
     {

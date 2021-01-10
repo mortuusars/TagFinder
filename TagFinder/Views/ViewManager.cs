@@ -3,7 +3,7 @@ using TagFinder.Views;
 
 namespace TagFinder
 {
-    public class ViewManager
+    public static class ViewManager
     {
         #region MainView
 
@@ -15,9 +15,9 @@ namespace TagFinder
             if (MainView != null)
                 return;
 
-            MainViewModel = new MainViewModel();
+            MainViewModel = new MainViewModel(Program.PageManager);
 
-            MainView = new MainView(Program.PageManager);
+            MainView = new MainView();
             MainView.DataContext = MainViewModel;
 
             MainView.Show();
