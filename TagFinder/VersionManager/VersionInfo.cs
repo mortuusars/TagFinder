@@ -1,5 +1,8 @@
-﻿namespace TagFinder
+﻿namespace TagFinder.VersionManager
 {
+    /// <summary>
+    /// Contains information about app version.
+    /// </summary>
     public class VersionInfo
     {
         public string Version { get; set; }

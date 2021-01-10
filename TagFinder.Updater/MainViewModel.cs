@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Windows.Input;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Windows.Threading;
 using PropertyChanged;
 
@@ -13,14 +16,20 @@ namespace TagFinder.Updater
 
         public MainViewModel()
         {
-            IUpdateService updateService = new UpdateService();
-            updateService.UpdateProcess += (_, status) => OnProcessUpdate(status);
-            updateService.Update();
+            UpdateApp();
         }
 
-        private void OnProcessUpdate(string status)
+        private void OnProcessUpdate(string status) => UpdateProcess = status;
+
+        private async void UpdateApp()
         {
-            if (status.Contains("Failed") || status.Contains("Finished"))
+            InProgress = true;
+
+            IUpdateService updateService = new UpdateService();
+            updateService.UpdateProcess += (_, status) => OnProcessUpdate(status);
+            bool isUpdateSuccessful = await updateService.Update();
+
+            if (isUpdateSuccessful)
             {
                 InProgress = false;
 
@@ -33,9 +42,28 @@ namespace TagFinder.Updater
                 };
 
                 timer.Start();
+
+                SaveUpdateLog(updateService.UpdateLog);
+            }
+        }
+
+        private void SaveUpdateLog(List<string> log)
+        {
+            StringBuilder sb = new StringBuilder(log.Count);
+
+            foreach (var item in log)
+            {
+                sb.Append(item).Append('\n');
             }
 
-            UpdateProcess = status;
+            try
+            {
+                File.WriteAllText("updateLog.txt", sb.ToString());
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("Failed to save updatelog.");
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Controls;
+using TagFinder.VersionManager;
 
 namespace TagFinder.ViewModels
 {
@@ -24,7 +25,7 @@ namespace TagFinder.ViewModels
             StatusManager.StatusChanged += (_, e) => Status = StatusManager.Status;
             StatusManager.InProgressChanged += (_, e) => IsOverlayVisible = StatusManager.InProgress;
 
-            Title = "Tag Finder " + Program.APP_VERSION.ToString();
+            Title = "Tag Finder " + Program.VersionManager.CurrentAppVersion.ToString();
         }
     }
 }

@@ -14,12 +14,11 @@ namespace TagFinder
     public class Program
     {
         public const string APP_NAME = "TagFinder";
-        public static readonly Version APP_VERSION = new Version("0.2.0");
+        public const string APP_VERSION = "0.2.0";
 
-        //public static ViewManager ViewManager { get; private set; }
+        public static IVersionManager VersionManager { get; private set; }
         public static PageManager PageManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
-
         public static Settings Settings { get; private set; }
         public static ILogger Logger { get; private set; }
 
@@ -30,34 +29,90 @@ namespace TagFinder
             Logger = new FileLogger(FilePath.LOG_FILE);
             Settings = Settings.Load();
 
+            VersionManager = new JsonVersionManager(Logger);
+
             if (Settings.CheckForUpdates)
                 CheckUpdates();
 
             InstagramAPIService = new InstagramAPI(FilePath.STATE_FILEPATH, Logger);
 
             PageManager = new PageManager();
-
-            //ViewManager = new ViewManager();
             ViewManager.ShowMainView();
-
             SetStartingPage();
-
-#if DEBUG
-            GenerateVersionJson();
-#endif
         }
 
-        private static void GenerateVersionJson()
+
+
+        #region Update
+
+        private async void CheckUpdates()
         {
-            var info = new VersionInfo()
+            string updateUrl;
+            try
             {
-                Version = APP_VERSION.ToString(),
-                Changelog = File.ReadAllText(FilePath.LATEST_CHANGELOG_FILE)
-            };
+                updateUrl = File.ReadAllText(FilePath.UPDATE_URL_FILE);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("[Checking Updates] - Cannot read updateUrl.txt. Updates would not be checked:\n" + ex.Message);
+                return; // No url = no updates.
+            }
 
-            string jsonString = JsonSerializer.Serialize(info, new JsonSerializerOptions() { WriteIndented = true });
-            File.WriteAllText("latestVersion.json", jsonString);
+            var (isUpdateAvailable, versionInfo) = await VersionManager.CheckNewVersionAsync(updateUrl);
+
+            if (!isUpdateAvailable)
+                return;
+
+            if (AskUserForUpdate(versionInfo))
+            {
+                if (versionInfo.ShouldUpdateManually)
+                    StartProcess(FilePath.MANUAL_UPDATE_URL_FILE); // Open download page
+                else
+                    StartProcess("TagFinder.Updater.exe"); // Start updater.
+
+                App.Current.Shutdown();
+            }
         }
+
+        private void StartProcess(string name)
+        {
+            ProcessStartInfo processStartInfo = new ProcessStartInfo(name)
+            {
+                UseShellExecute = true,
+                Verb = "open"
+            };
+            Process.Start(processStartInfo);
+        }
+
+        private static bool AskUserForUpdate(VersionInfo newVersionInfo)
+        {
+            string changelog = newVersionInfo.Changelog;
+
+            if (changelog.Length > 300)
+                changelog = changelog.Substring(0, 300) + "...\nAnd many more changes!";
+
+            string updateAction;
+
+            if (newVersionInfo.ShouldUpdateManually)
+                updateAction = "Manual update needed. Open download page?";
+            else
+                updateAction = "Update automatically?";
+
+            string message = $"New update available. {updateAction}\n\n" +
+                             $"Current version: {VersionManager.CurrentAppVersion}\n" +
+                             $"New version: {newVersionInfo.Version}" +
+                             $"\n\nChanges:\n\n{changelog}";
+
+            if (MessageBox.Show(message, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Information,
+                MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                return true;
+
+            return false;
+        }
+
+        #endregion
+
+
 
         private async void SetStartingPage()
         {
@@ -87,65 +142,7 @@ namespace TagFinder
             StatusManager.InProgress = false;
         }
 
-        #region Update
 
-        private async void CheckUpdates()
-        {
-            IVersionManager versionManager = new JsonVersionManager(Logger);
-
-            var (isUpdateAvailable, versionInfo) = await versionManager.CheckNewVersionAsync(APP_VERSION, File.ReadAllText(FilePath.UPDATE_URL_FILE));
-
-            if (!isUpdateAvailable)
-                return;
-
-            if (AskUserForUpdate(versionInfo))
-            {
-                //if (versionInfo.ShouldUpdateManually)
-                //    StartUpdateProcess(FilePath.MANUAL_UPDATE_URL_FILE);
-                //else
-                //    StartUpdateProcess("TagFinder.Updater.exe");
-
-                //App.Current.Shutdown();
-            }
-        }
-
-        private void StartUpdateProcess(string name)
-        {
-            ProcessStartInfo processStartInfo = new ProcessStartInfo(name)
-            {
-                UseShellExecute = true,
-                Verb = "open"
-            };
-            Process.Start(processStartInfo);
-        }
-
-        private static bool AskUserForUpdate(VersionInfo newVersionInfo)
-        {
-            string changelog = newVersionInfo.Changelog;
-
-            if (changelog.Length > 300)
-                changelog = changelog.Substring(0, 300) + "...\nAnd many more changes!";
-
-            string updateAction = "";
-
-            if (newVersionInfo.ShouldUpdateManually)
-                updateAction = "Manual update needed. Open download page?";
-            else
-                updateAction = "Update automatically?";
-
-            string message = $"New update available. {updateAction}\n\n" +
-                             $"Current version: {APP_VERSION}\n" +
-                             $"New version: {newVersionInfo.Version}" +
-                             $"\n\nChanges:\n\n{changelog}";
-
-            if (MessageBox.Show(message, "Tag Finder Update", MessageBoxButton.YesNo, MessageBoxImage.Information,
-                MessageBoxResult.Yes) == MessageBoxResult.Yes)
-                return true;
-
-            return false;
-        }
-
-        #endregion
 
         private void CreateAppFolders()
         {

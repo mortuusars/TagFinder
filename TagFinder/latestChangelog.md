@@ -1,4 +1,4 @@
-# 0.2.0 - 2021-01-07
+# 0.2.0 - 2021-01-08
 
 Updater Time!
 - Tag Finder now can update itself
