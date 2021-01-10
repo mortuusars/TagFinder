@@ -1,45 +1,74 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>Resources\Images\hashtag_size.ico</ApplicationIcon>
-    <Version>0.1.2</Version>
+	<OutputType>WinExe</OutputType>
+	<TargetFramework>net5.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<ApplicationIcon>Resources\Images\hashtag_size.ico</ApplicationIcon>
+	<Version>0.2.0</Version>
+	<AssemblyName>TagFinder</AssemblyName>
+	<Authors>mortuusars</Authors>
+	<PreserveCompilationContext>false</PreserveCompilationContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Images\loading.png" />
-    <None Remove="Resources\Images\loading_128.gif" />
-    <None Remove="Resources\Images\loading_194.gif" />
-    <None Remove="Resources\Images\loading_214.gif" />
-    <None Remove="Resources\Images\loading_64.gif" />
-    <None Remove="Resources\Images\logo.png" />
-    <None Remove="Resources\Images\user_48.png" />
+	<None Remove="Resources\Fonts\Montserrat-ExtraLight.ttf" />
+	<None Remove="Resources\Fonts\Montserrat-Light.ttf" />
+	<None Remove="Resources\Fonts\Montserrat-Medium.ttf" />
+	<None Remove="Resources\Fonts\Montserrat-Regular.ttf" />
+	<None Remove="Resources\Fonts\Montserrat-SemiBold.ttf" />
+	<None Remove="Resources\Images\loading.png" />
+	<None Remove="Resources\Images\loading_128.gif" />
+	<None Remove="Resources\Images\loading_194.gif" />
+	<None Remove="Resources\Images\loading_214.gif" />
+	<None Remove="Resources\Images\loading_64.gif" />
+	<None Remove="Resources\Images\logo.png" />
+	<None Remove="Resources\Images\user_48.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\loading.png" />
+	<Resource Include="Resources\Fonts\Montserrat-ExtraLight.ttf" />
+	<Resource Include="Resources\Fonts\Montserrat-Light.ttf" />
+	<Resource Include="Resources\Fonts\Montserrat-Medium.ttf" />
+	<Resource Include="Resources\Fonts\Montserrat-Regular.ttf" />
+	<Resource Include="Resources\Fonts\Montserrat-SemiBold.ttf" />
+	<Resource Include="Resources\Images\loading.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="InstagramApiSharp" Version="1.5.0.1" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.3.1" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+	<PackageReference Include="InstagramApiSharp" Version="1.5.0.1" />
+	  <PackageReference Include="PropertyChanged.Fody" Version="3.3.1">
+		  <PrivateAssets>all</PrivateAssets>
+	  </PackageReference>
+	<PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\logo.png" />
-    <Resource Include="Resources\Images\user_48.png" />
+	<Resource Include="Resources\Images\logo.png" />
+	<Resource Include="Resources\Images\user_48.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="changelog.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="updateUrl.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+	<None Update="changelog.md">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+	<None Update="downloadUrl.txt">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+	<None Update="latestChangelog.md">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+	<None Update="manualUpdateUrl.txt">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+	<None Update="updateUrl.txt">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\TagFinder.Core\TagFinder.Core.csproj" />
+	<ProjectReference Include="..\TagFinder.Updater\TagFinder.Updater.csproj" />
   </ItemGroup>
 
 </Project>

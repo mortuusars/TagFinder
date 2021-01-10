@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace TagFinder.Logger
+namespace TagFinder.Core.Logger
 {
     public class FileLogger : ILogger
     {
@@ -11,8 +11,6 @@ namespace TagFinder.Logger
         public FileLogger(string filePath)
         {
             _filePath = filePath;
-
-
 
             CheckFileSize();
         }

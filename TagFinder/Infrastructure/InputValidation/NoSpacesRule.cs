@@ -15,7 +15,7 @@ namespace TagFinder
             string input = value as string;
 
             if (input.Contains(' '))
-                return new ValidationResult(false, "Without spaces.");
+                return new ValidationResult(false, "No spaces allowed");
 
             return new ValidationResult(true, null);
         }

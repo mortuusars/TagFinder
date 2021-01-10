@@ -7,19 +7,25 @@
              xmlns:app="clr-namespace:TagFinder"
              mc:Ignorable="d" 
              d:DesignHeight="130" d:DesignWidth="260"
-             FontSize="16"
-             FontFamily="{StaticResource MontserratRegular}">
+             FontSize="15"
+             FontFamily="{StaticResource MontserratLight}">
 
-    <Border Background="#efefef" 
-            BorderThickness="2"
-            BorderBrush="#6FADD1"
-            Margin="16"
-            CornerRadius="{StaticResource RoundedCornerValue}">
-        <Border.Effect>
-            <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-90" Opacity="0.25"/>
-        </Border.Effect>
+    <Grid Margin="18">
 
-        <Grid Margin="6 6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="#efefef" 
+                BorderThickness="2"
+                BorderBrush="#6FADD1"
+                CornerRadius="{StaticResource RoundedCornerValue}">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="12" ShadowDepth="3" Direction="-90" Opacity="0.25"/>
+            </Border.Effect>
+        </Border>
+
+        <Grid Margin="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -55,7 +61,7 @@
                     <KeyBinding Key="Esc" Command="{Binding CloseAddingCustomTagCommand}"/>
                 </TextBox.InputBindings>
             </TextBox>
-            
+
 
             <!-- Buttons -->
             <Grid Grid.Row="2">
@@ -77,5 +83,8 @@
                         Command="{Binding AddCustomTagCommand}">Add</Button>
             </Grid>
         </Grid>
-    </Border>
+
+        
+
+    </Grid>
 </UserControl>

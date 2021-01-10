@@ -8,12 +8,14 @@
         xmlns:wpfanimated="http://wpfanimatedgif.codeplex.com"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Tag Finder"
+        Title="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         MinWidth="280"
         MinHeight="350"
         Width="400"
         Height="600" 
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource MontserratRegular}">
 
     <Window.Resources>
 
@@ -68,9 +70,8 @@
     
     <Grid>
         <Frame x:Name="PageFrame"
+               Content="{Binding CurrentPage}"
                NavigationUIVisibility="Hidden"/>
-
-        <!--<Button Content="Button" Width="120" Height="50" Click="Button_Click"/>-->
 
         <Grid x:Name="OverlayPanel"
               Background="#99222222"
@@ -80,14 +81,6 @@
 
             <StackPanel VerticalAlignment="Center">
                 
-                <!--<Image wpfanimated:ImageBehavior.AnimatedSource="../Resources/Images/loading_128.gif"
-                   wpfanimated:ImageBehavior.AnimateInDesignMode="True"
-                   wpfanimated:ImageBehavior.RepeatBehavior="1"
-                   wpfanimated:ImageBehavior.AutoStart="True"
-                   wpfanimated:ImageBehavior.AnimationSpeedRatio="4"
-                   Height="100"
-                   RenderOptions.BitmapScalingMode="Fant"/>-->
-
                 <Image Source="../Resources/Images/loading.png"
                        Width="110"
                        RenderTransformOrigin="0.5 0.5">

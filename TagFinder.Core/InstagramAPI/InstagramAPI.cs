@@ -3,27 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 using InstagramApiSharp;
 using InstagramApiSharp.API;
 using InstagramApiSharp.API.Builder;
 using InstagramApiSharp.Classes;
 using InstagramApiSharp.Classes.Android.DeviceInfo;
-using TagFinder.Logger;
+using TagFinder.Core.Logger;
 
-namespace TagFinder.InstagramAPI
+namespace TagFinder.Core.InstagramAPI
 {
-    public class StandardInstagramAPI : IInstagramAPI
+    public class InstagramAPI : IInstagramAPI
     {
         public string CurrentUserName { get; private set; }
-        public BitmapImage UserProfilePic { get; private set; }
+        //public string UserProfilePicUrl { get; private set; }
 
         private IInstaApi _instaApi;
 
         private readonly string _userStateFilePath;
         private readonly ILogger _logger;
 
-        public StandardInstagramAPI(string userStateFilePath, ILogger logger)
+        public InstagramAPI(string userStateFilePath, ILogger logger)
         {
             _userStateFilePath = userStateFilePath;
             _logger = logger;
@@ -119,7 +118,7 @@ namespace TagFinder.InstagramAPI
                 }
             }
 
-            UserProfilePic = await DownloadUserProfilePicAsync(userName);
+            //UserProfilePicUrl = await DownloadUserProfilePicAsync(userName);
 
             SaveSession();
 
@@ -384,20 +383,18 @@ namespace TagFinder.InstagramAPI
             return hashtagInfo.Succeeded ? hashtagInfo.Value.MediaCount : -1;
         }
 
-        public async Task<BitmapImage> DownloadUserProfilePicAsync(string userName)
+        public async Task<string> DownloadUserProfilePicAsync(string userName)
         {
             _logger.Log("Getting user profile picture");
             var userInfo = await _instaApi.UserProcessor.GetUserInfoByUsernameAsync(userName);
 
             if (userInfo.Succeeded)
             {
-                _logger.Log("Downloading profile pic");
-                var pic = Utility.GetUserProfilePicFromUrl(userInfo.Value.ProfilePicUrl);
-                UserProfilePic = pic;
-                return pic;
+                //_logger.Log("Downloading profile pic");
+                return userInfo.Value.ProfilePicUrl;
             }
 
-            return Utility.GetDefaultProfilePic();
+            return null;
         }
 
         //public async Task<string> GetUserTags()

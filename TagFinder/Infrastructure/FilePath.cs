@@ -2,7 +2,7 @@
 
 namespace TagFinder
 {
-    public static class FileNames
+    public static class FilePath
     {
         /// <summary>
         /// Path to application folder. Ends with /.
@@ -19,11 +19,12 @@ namespace TagFinder
         public static readonly string LAST_USER_FILEPATH = CACHE + "lastUser.";
         public static readonly string PAGES_TO_LOAD_FILEPATH = CACHE + "pagesToLoad.";
         public static readonly string TAG_LIMIT_FILEPATH = CACHE + "tagLimit.";
-        public static readonly string USER_PROFILE_PIC_FILEPATH = CACHE + "profilePic.jpg";
+
+        public static readonly string LOG_FILE = APPLOCAL_FOLDER + "log.txt";
 
         public const string CHANGELOG_FILE = "changelog.md";
+        public const string LATEST_CHANGELOG_FILE = "latestChangelog.md";
         public const string UPDATE_URL_FILE = "updateUrl.txt";
-
-        public const string LOG_FILE = "log.txt";
+        public const string MANUAL_UPDATE_URL_FILE = "manualUpdateUrl.txt";
     }
 }
