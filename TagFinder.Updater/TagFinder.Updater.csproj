@@ -32,6 +32,9 @@
 	<None Update="manualUpdateUrl.txt">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
+	<None Update="TagFinder.Updater.runtimeconfig.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
 </Project>
