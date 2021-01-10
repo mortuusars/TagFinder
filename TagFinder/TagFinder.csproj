@@ -5,7 +5,7 @@
 	<TargetFramework>net5.0-windows</TargetFramework>
 	<UseWPF>true</UseWPF>
 	<ApplicationIcon>Resources\Images\hashtag_size.ico</ApplicationIcon>
-	<Version>0.1.4</Version>
+	<Version>0.2.0</Version>
 	<AssemblyName>TagFinder</AssemblyName>
 	<Authors>mortuusars</Authors>
 	<PreserveCompilationContext>false</PreserveCompilationContext>
