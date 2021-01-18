@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using PropertyChanged;
 using TagFinder.Core.InstagramAPI;
 using TagFinder.Core.Logger;
+using TagFinder.Toasts;
 
 namespace TagFinder.ViewModels
 {
@@ -63,12 +64,14 @@ namespace TagFinder.ViewModels
 
         private IInstagramAPI _instagramAPI;
         private PageManager _pageManager;
+        private IToastManager _toastManager;
         private ILogger _logger;
 
-        public TagsViewModel(IInstagramAPI instagramAPI, PageManager pageManager, ILogger logger)
+        public TagsViewModel(IInstagramAPI instagramAPI, PageManager pageManager, IToastManager toastManager, ILogger logger)
         {
             _instagramAPI = instagramAPI;
             _pageManager = pageManager;
+            _toastManager = toastManager;
             _logger = logger;
 
             #region Commands
@@ -108,7 +111,9 @@ namespace TagFinder.ViewModels
 
         private void OnSelectedChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SelectedCount = SelectedTagsList.Count > 0 ? SelectedTagsList.Count : 0;
+            SelectedCount = SelectedTagsList.Count;
+            if (SelectedCount > 30)
+                _toastManager.ShowMessage("Tag limit exceeded", Resources.Icons.Error);
         }
 
         private async void GetUserProfilePic()
@@ -135,7 +140,7 @@ namespace TagFinder.ViewModels
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                StatusManager.Status = "Entered username is incorrect";
+                _toastManager.ShowMessage("Entered username is incorrect", Resources.Icons.Error);
                 return;
             }
 
@@ -146,32 +151,33 @@ namespace TagFinder.ViewModels
 
             var list = await _instagramAPI.GetTagsFromListAsync(username, PagesToLoad, IncludeGlobalCount);
 
-            StatusManager.InProgress = false;
+            StatusManager.Clear();
 
             if (list == null)
             {
                 IsContentAvailable = false;
 
                 if (!Utility.CheckInternetAvailability())
-                    StatusManager.Status = "Not connected to internet";
-                else 
-                    StatusManager.Status = "Getting tags failed";
+                    _toastManager.ShowMessage("Not connected to internet", Resources.Icons.Error);
+                else
+                    _toastManager.ShowMessage("Getting tags failed", Resources.Icons.Error);
 
                 return;
             }
 
-            TagsList = list.OrderByDescending(i => i.Count).Take(TagLimit).ToList();
-
-            if (TagsList.Count > 0)
+            if (list.Count > 0)
             {
                 IsContentAvailable = true;
-                StatusManager.Status = "Done";
+                _toastManager.ShowMessage("Done");
             }
             else
             {
                 IsContentAvailable = false;
-                StatusManager.Status = "No posts";
+                _toastManager.ShowMessage("No posts");
+                return;
             }
+
+            TagsList = list.OrderByDescending(i => i.Count).Take(TagLimit).ToList();
         }
 
         #region ADD

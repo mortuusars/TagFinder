@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Windows.Controls;
-using TagFinder.VersionManager;
 
 namespace TagFinder.ViewModels
 {
@@ -14,6 +13,8 @@ namespace TagFinder.ViewModels
 
         public bool IsOverlayVisible { get; set; }
         public string Status { get; set; }
+
+        public ToastControlViewModel ToastControlViewModel { get; set; } = new ToastControlViewModel();
 
         private readonly PageManager _pageManager;
 

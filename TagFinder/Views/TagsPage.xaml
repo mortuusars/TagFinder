@@ -550,12 +550,12 @@
               Grid.Row="2"
               Margin="6 6 6 4">
 
-            <TextBlock x:Name="StatusText"
+            <!--<TextBlock x:Name="StatusText"
                        Text="{Binding Status}"
                        FontSize="16"
                        VerticalAlignment="Bottom"
                        d:Text="Ready"
-                       Foreground="Gray"/>
+                       Foreground="Gray"/>-->
 
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"

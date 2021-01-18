@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace TagFinder.ViewModels.Converters
+namespace TagFinder.Views.Converters
 {
     [ValueConversion(typeof(int), typeof(Visibility))]
     public class LengthToVisibilityConverter : IValueConverter

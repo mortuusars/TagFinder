@@ -22,7 +22,7 @@ namespace TagFinder
                     newPage = new LoginPage() { DataContext = new LoginViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
                     break;
                 case Pages.TagsPage:
-                    newPage = new TagsPage() { DataContext = new TagsViewModel(Program.InstagramAPIService, Program.PageManager, Program.Logger) };
+                    newPage = new TagsPage() { DataContext = new TagsViewModel(Program.InstagramAPIService, Program.PageManager, Program.ToastManager, Program.Logger) };
                     break;
             }
 

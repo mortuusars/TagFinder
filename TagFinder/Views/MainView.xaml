@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TagFinder"
-        xmlns:conv="clr-namespace:TagFinder.ViewModels.Converters"
-        xmlns:wpfanimated="http://wpfanimatedgif.codeplex.com"
+        xmlns:controls="clr-namespace:TagFinder.Views.Controls"
+        xmlns:vm="clr-namespace:TagFinder.ViewModels"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -72,6 +72,10 @@
         <Frame x:Name="PageFrame"
                Content="{Binding CurrentPage}"
                NavigationUIVisibility="Hidden"/>
+
+        <UserControl VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <controls:ToastControl DataContext="{Binding ToastControlViewModel}"/>
+        </UserControl>
 
         <Grid x:Name="OverlayPanel"
               Background="#99222222"

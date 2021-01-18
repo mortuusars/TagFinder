@@ -8,6 +8,7 @@ using TagFinder.Core.Logger;
 using TagFinder.Views.Pages;
 using System.Text.Json;
 using TagFinder.VersionManager;
+using TagFinder.Toasts;
 
 namespace TagFinder
 {
@@ -18,6 +19,7 @@ namespace TagFinder
 
         public static IVersionManager VersionManager { get; private set; }
         public static PageManager PageManager { get; private set; }
+        public static IToastManager ToastManager { get; private set; }
         public static IInstagramAPI InstagramAPIService { get; private set; }
         public static Settings Settings { get; private set; }
         public static ILogger Logger { get; private set; }
@@ -37,6 +39,7 @@ namespace TagFinder
             InstagramAPIService = new InstagramAPI(FilePath.STATE_FILEPATH, Logger);
 
             PageManager = new PageManager();
+            ToastManager = new ToastManager();
             ViewManager.ShowMainView();
             SetStartingPage();
         }
@@ -131,7 +134,8 @@ namespace TagFinder
                 StatusManager.InProgress = true;
 
                 await InstagramAPIService.DownloadUserProfilePicAsync(InstagramAPIService.CurrentUserName);
-                StatusManager.Status = "Logged as " + InstagramAPIService.CurrentUserName;
+                //StatusManager.Status = "Logged as " + InstagramAPIService.CurrentUserName;
+                ToastManager.ShowMessage("Logged as " + InstagramAPIService.CurrentUserName);
                 PageManager.SetPage(Pages.TagsPage);
             }
             else
@@ -139,7 +143,9 @@ namespace TagFinder
                 PageManager.SetPage(Pages.LoginPage);
             }
 
-            StatusManager.InProgress = false;
+            //StatusManager.InProgress = false;
+
+            StatusManager.Clear();
         }
 
 

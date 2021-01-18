@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace TagFinder.ViewModels.Converters
+namespace TagFinder.Views.Converters
 {
     [ValueConversion(typeof(int), typeof(SolidColorBrush))]
     public class CountForegroundConverter : IValueConverter

@@ -24,5 +24,11 @@ namespace TagFinder
             get { return status; }
             set { status = value; StatusChanged?.Invoke(null, EventArgs.Empty); }
         }
+
+        public static void Clear()
+        {
+            InProgress = false;
+            Status = "";
+        }
     }
 }
