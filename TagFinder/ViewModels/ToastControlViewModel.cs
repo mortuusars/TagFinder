@@ -10,7 +10,7 @@ namespace TagFinder.ViewModels
     [AddINotifyPropertyChangedInterface]
     public class ToastControlViewModel
     {
-        const int ShowingTimeMS = 2000;
+        const int ShowingTimeMS = 3500;
         const int AnimationDelayMS = 300;
 
         public Toast CurrentToast { get; set; } = new Toast() { Message = "" };

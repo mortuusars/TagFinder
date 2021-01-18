@@ -8,6 +8,7 @@ using InstagramApiSharp.API;
 using InstagramApiSharp.API.Builder;
 using InstagramApiSharp.Classes;
 using InstagramApiSharp.Classes.Android.DeviceInfo;
+using InstagramApiSharp.Classes.Models;
 using TagFinder.Core.Logger;
 
 namespace TagFinder.Core.InstagramAPI
@@ -15,7 +16,6 @@ namespace TagFinder.Core.InstagramAPI
     public class InstagramAPI : IInstagramAPI
     {
         public string CurrentUserName { get; private set; }
-        //public string UserProfilePicUrl { get; private set; }
 
         private IInstaApi _instaApi;
 
@@ -304,54 +304,79 @@ namespace TagFinder.Core.InstagramAPI
             _logger.Log($"Loged out: {result.Succeeded}");
         }
 
-        private async Task<List<string>> GetPostDataFromUserAsync(string userName, int pagesToLoad)
+        public async Task<PostData> GetUserPostDataAsync(string userName, int pagesToLoad)
+        {
+            InstaMediaList mediaList = await GetMediaListFromUserAsync(userName, pagesToLoad);
+
+            if (mediaList == null)
+                return null;
+
+            _logger.Log($"Found {mediaList.Count} posts");
+
+            PostData postData = new PostData();
+            postData.MediaCount = mediaList.Count;
+
+            (List<string> postTexts, DateTime lastPostDate) postsInfo  = GetPostsInfo(mediaList);
+
+            postData.Tags = GetTagsFromText(postsInfo.postTexts);
+            postData.LastPostDate = postsInfo.lastPostDate;
+
+            return postData;
+        }
+
+
+        private async Task<InstaMediaList> GetMediaListFromUserAsync(string userName, int pagesToLoad)
         {
             _logger.Log($"Getting {pagesToLoad} pages of media from @{userName}...");
-            var media = await _instaApi.UserProcessor.GetUserMediaAsync(userName, PaginationParameters.MaxPagesToLoad(pagesToLoad));
+            var result = await _instaApi.UserProcessor.GetUserMediaAsync(userName, PaginationParameters.MaxPagesToLoad(pagesToLoad));
 
-            if (media.Succeeded)
+            if (result.Succeeded)
             {
-                _logger.Log($"Found {media.Value.Count} posts");
-
-                List<string> postTexts = new List<string>();
-
-                foreach (var item in media.Value)
-                {
-                    if (item.Caption != null)
-                        postTexts.Add(item.Caption.Text);
-
-                    //if (item.PreviewComments != null)
-                    //{
-                    //    var comments = await _instaApi.CommentProcessor.GetMediaCommentsAsync(item.InstaIdentifier, PaginationParameters.MaxPagesToLoad(2));
-
-                    //    if (comments.Succeeded)
-                    //        foreach (var comment in comments.Value.Comments)
-                    //        {
-                    //            if (comment.User.UserName == userName)
-                    //                postTexts.Add(comment.Text);
-                    //        }
-                    //}
-                }
-
-                return postTexts;
+                return result.Value;
             }
             else
             {
                 _logger.Log("Getting media failed");
-                _logger.Log(media.Info.Message);
+                _logger.Log(result.Info.Message);
                 return null;
             }
         }
 
-        public async Task<List<TagRecord>> GetTagsFromListAsync(string username, int pagesToLoad, bool includeGlobalCount = false)
+        private (List<string> postTexts, DateTime lastPostDate) GetPostsInfo(InstaMediaList mediaList)
         {
-            var list = await GetPostDataFromUserAsync(username, pagesToLoad);
+            List<string> postTexts = new List<string>();
+            DateTime lastPostDate = DateTime.Now;
 
+            foreach (var post in mediaList)
+            {
+                if (post.Caption != null)
+                    postTexts.Add(post.Caption.Text);
+
+                lastPostDate = post.TakenAt;
+
+                //Comments
+
+                //if (item.PreviewComments != null)
+                //{
+                //    var comments = await _instaApi.CommentProcessor.GetMediaCommentsAsync(item.InstaIdentifier, PaginationParameters.MaxPagesToLoad(2));
+
+                //    if (comments.Succeeded)
+                //        foreach (var comment in comments.Value.Comments)
+                //        {
+                //            if (comment.User.UserName == userName)
+                //                postTexts.Add(comment.Text);
+                //        }
+                //}
+            }
+
+            return (postTexts, lastPostDate);
+        }
+
+        public List<TagRecord> GetTagsFromText(List<string> list)
+        {
             List<TagRecord> tagList = new List<TagRecord>();
 
-            if (list == null)
-                return null;
-            else if (list.Count < 1)
+            if (list.Count < 1)
                 return tagList;
 
             _logger.Log("Extracting tags from media...");

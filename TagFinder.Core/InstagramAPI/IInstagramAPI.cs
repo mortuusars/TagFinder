@@ -5,15 +5,15 @@ namespace TagFinder.Core.InstagramAPI
 {
     public interface IInstagramAPI
     {
-        public string CurrentUserName { get; }
-        //public string UserProfilePicUrl { get; }
+        string CurrentUserName { get; }
 
-        public Task<LoginResult> LogInAsync(string userName, string password = null);
-        public Task ProvidePhoneNumberAsync(string phoneNumber);
-        public Task<LoginResult> ProvideVerificationCodeAsync(string code);
-        public Task LogOutAsync();
-        public Task<List<TagRecord>> GetTagsFromListAsync(string username, int pagesToLoad, bool includeGlobalCount = false);
-        public Task<long> GetGlobalHashtagUsesAsync(string hashtag);
-        public Task<string> DownloadUserProfilePicAsync(string userName);
+        Task<string> DownloadUserProfilePicAsync(string userName);
+        Task<long> GetGlobalHashtagUsesAsync(string hashtag);
+        List<TagRecord> GetTagsFromText(List<string> list);
+        Task<PostData> GetUserPostDataAsync(string userName, int pagesToLoad);
+        Task<LoginResult> LogInAsync(string userName, string password = null);
+        Task LogOutAsync();
+        Task ProvidePhoneNumberAsync(string phoneNumber);
+        Task<LoginResult> ProvideVerificationCodeAsync(string code);
     }
 }

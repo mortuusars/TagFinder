@@ -149,11 +149,13 @@ namespace TagFinder.ViewModels
 
             SavePreferences();
 
-            var list = await _instagramAPI.GetTagsFromListAsync(username, PagesToLoad, IncludeGlobalCount);
+            var userPostData = await _instagramAPI.GetUserPostDataAsync(username, PagesToLoad);
+
+            _toastManager.ShowMessage($"Found {userPostData.MediaCount} posts up to {userPostData.LastPostDate:dd MMMM yyyy}");
 
             StatusManager.Clear();
 
-            if (list == null)
+            if (userPostData.Tags == null)
             {
                 IsContentAvailable = false;
 
@@ -165,10 +167,9 @@ namespace TagFinder.ViewModels
                 return;
             }
 
-            if (list.Count > 0)
+            if (userPostData.Tags.Count > 0)
             {
                 IsContentAvailable = true;
-                _toastManager.ShowMessage("Done");
             }
             else
             {
@@ -177,7 +178,7 @@ namespace TagFinder.ViewModels
                 return;
             }
 
-            TagsList = list.OrderByDescending(i => i.Count).Take(TagLimit).ToList();
+            TagsList = userPostData.Tags.OrderByDescending(i => i.Count).Take(TagLimit).ToList();
         }
 
         #region ADD
